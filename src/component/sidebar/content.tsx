@@ -26,7 +26,7 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 const menuSections = [
   {
-    title: "HR",
+    title: "HRMS",
     icon: <PeopleAltIcon />,
     key: "hr",
     children: [

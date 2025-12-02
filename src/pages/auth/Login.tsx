@@ -19,7 +19,6 @@ const Login: FC = () => {
       return;
     }
 
-    // Retrieve user from localStorage
     const storedUser = localStorage.getItem("user");
     if (!storedUser) {
       setError("No account found. Please sign up first.");
@@ -29,10 +28,13 @@ const Login: FC = () => {
     const user = JSON.parse(storedUser);
 
     if (user.email === email && user.password === password) {
-      // Dispatch login action
       dispatch(loginUser({ name: user.name, email: user.email }));
 
-      // Save authenticated state to localStorage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ name: user.name, email: user.email, password: user.password })
+      );
+
       localStorage.setItem("isAuthenticated", "true");
 
       navigate("/");

@@ -6,24 +6,40 @@ import {
   Box,
   useMediaQuery,
   useTheme,
+  Modal,
+  Button,
 } from "@mui/material";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../store/hooks";
+import { logoutUser } from "../../store/slices/userSlice";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MenuIcon from "@mui/icons-material/Menu";
 import { H6 } from "../responsiveText";
 import { useAppSelector } from "../../store/hooks";
+import { useState } from "react";
 
-const Topbar = ({
-  isOpen,
-  toggleSidebar,
-}: {
-  isOpen: any;
-  toggleSidebar: any;
-}) => {
+const Topbar = ({ isOpen, toggleSidebar }: { isOpen: any; toggleSidebar: any }) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+
+  const dispatch = useAppDispatch();     // ✅ FIX
+  const navigate = useNavigate();        // ✅ FIX
+
   const user = useAppSelector((state) => state.user);
+  const [openLogout, setOpenLogout] = useState(false);
+
+  const username = user.isAuthenticated && user.name ? user.name : "";
+
+
+const handleLogout = () => {
+  dispatch(logoutUser());
+
+  localStorage.setItem("isAuthenticated", "false");
+
+  navigate("/login");
+
+  setOpenLogout(false);
+};
 
   return (
     <AppBar
@@ -48,6 +64,7 @@ const Topbar = ({
           alignItems: "center",
         }}
       >
+        {/* LEFT SECTION */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton
             sx={{
@@ -57,35 +74,75 @@ const Topbar = ({
             }}
             onClick={toggleSidebar}
           >
-            {" "}
-            {isOpen ? (
-              <MenuOpenIcon fontSize="medium" />
-            ) : (
-              <MenuIcon fontSize="medium" />
-            )}{" "}
+            {isOpen ? <MenuOpenIcon fontSize="medium" /> : <MenuIcon fontSize="medium" />}
           </IconButton>
-          {isOpen && (
-            <H6 sx={{ ml: 1, color: "text.primary", fontWeight: 600 }}>
-              {user.isAuthenticated && user.name ? user.name : "HRMS"}
-            </H6>
-          )}
+
+          {/* HRMS always on left */}
+          <H6 sx={{ ml: 1, color: "text.primary", fontWeight: 600 }}>HRMS</H6>
         </Box>
 
+        {/* RIGHT SECTION */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {!isOpen && (
-            <H6 sx={{ color: "text.primary", fontWeight: 600 }}>
-              {user.isAuthenticated && user.name ? user.name : "HRMS"}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {/* Username clickable */}
+            <H6
+              sx={{ color: "#c7b078", fontWeight: 600, cursor: "pointer" }}
+              onClick={() => setOpenLogout(true)}
+            >
+              {username || "HRMS"}
             </H6>
-          )}
-          {!isOpen && (
-            <img
-              src="/Mechri-Logo.png"
-              alt="Mechri Logo"
-              style={{ height: 40, width: "auto", objectFit: "contain" }}
-            />
-          )}
+
+            {/* Vertical divider when sidebar is closed */}
+            {!isOpen && (
+              <Box
+                sx={{ width: "1px", height: 30, backgroundColor: "#E0E0E0" }}
+              />
+            )}
+
+            {/* Logo only when sidebar is CLOSED */}
+            {!isOpen && (
+              <img
+                src="/Mechri-Logo.png"
+                alt="Mechri Logo"
+                style={{ height: 40, width: "auto", objectFit: "contain" }}
+              />
+            )}
+          </Box>
         </Box>
       </Toolbar>
+
+      {/* Logout Modal */}
+      <Modal open={openLogout} onClose={() => setOpenLogout(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "white",
+            p: 4,
+            borderRadius: 2,
+            boxShadow: 24,
+            width: 300,
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Logout!
+          </Typography>
+          <Typography sx={{ mb: 3 }}>
+            Are you sure you want to logout?
+          </Typography>
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Modal>
     </AppBar>
   );
 };
