@@ -43,7 +43,7 @@ const Sidebar = ({ isOpen } : { isOpen:any }) => {
       // Render as Link if it has a route and no children
       return (
         <Link to={item.route} style={{ textDecoration: "none", color: "inherit" }} key={item.key || item.title}>
-          <ListItemButton sx={{ ml: marginLeft, borderRadius: 1, my: 0.3, px: 1.2, py: 0.9, "&:hover": { backgroundColor: "rgba(217, 196, 140, 0.22)" }, "& .MuiListItemIcon-root": { minWidth: 36 } }}>
+          <ListItemButton sx={{ ml: marginLeft, borderRadius: 1, my: 0.6, px: 1.2, py: 1.2, "&:hover": { backgroundColor: "rgba(217, 196, 140, 0.22)" }, "& .MuiListItemIcon-root": { minWidth: 36 } }}>
             <ListItemIcon sx={{ color: "black", mr: 0.8, ml: 1, minWidth: 36 }}> {item.icon} </ListItemIcon>
             <ListItemText sx={{m:0, p:0, gap:0, "& .MuiListItemText-primary": { fontSize: "0.9rem", fontWeight: 500 } }} primary={item.title} />
           </ListItemButton>
@@ -59,7 +59,7 @@ const Sidebar = ({ isOpen } : { isOpen:any }) => {
               borderRadius: 1.5,
               mx: level === 0 ? 0.5 : 0,
               ml: level > 0 ? marginLeft : undefined,
-              my: 0.75,
+              my: 0.6,
               px: 1.5,
               py: 1.2,
               justifyContent: isOpen ? "flex-start" : "center",

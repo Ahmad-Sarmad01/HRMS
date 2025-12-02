@@ -27,7 +27,7 @@ const Topbar = ( {isOpen,toggleSidebar } : { isOpen:any, toggleSidebar:any }) =>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <IconButton sx={{color:"secondary.main", transition: "all 0.3s ease", "&:hover": { backgroundColor: "rgba(217, 196, 140, 0.12)" }}} onClick={toggleSidebar}> {isOpen ? <MenuOpenIcon fontSize="medium" /> : <MenuIcon fontSize="medium" />} </IconButton>
-          <H6 sx={{ ml: 1, color: "text.primary", fontWeight: 600 }}> New Employee Registration </H6>
+          <H6 sx={{ ml: 1, color: "text.primary", fontWeight: 600 }}> HRMS </H6>
         </Box>
         
         {!isOpen && (

@@ -7,42 +7,61 @@ import DocumentRegister from "../pages/documents/DocumentRegister";
 import NewDocument from "../pages/documents/NewDocument";
 import DocumentSummary from "../pages/documents/DocumentSummary";
 import DocumentUpdate from "../pages/documents/DocumentUpdate";
-import StaffDetails from "../pages/hr/StaffDetails";
-import VisaPassport from "../pages/hr/VisaPassport";
-import Timesheet from "../pages/hr/Timesheet";
-import Payroll from "../pages/hr/Payroll";
-import LeaveManagement from "../pages/hr/LeaveManagement";
-import SalaryReports from "../pages/hr/SalaryReports";
-import WPSFiles from "../pages/hr/WPSFiles";
-import FinalSettlement from "../pages/hr/FinalSettlement";
+import StaffDetails from "../pages/reports/StaffDetails";
+import Timesheet from "../pages/attendance/Timesheet";
+import Payroll from "../pages/payroll/Payroll";
+import LeaveManagement from "../pages/leave/LeaveManagement";
+import SalaryReports from "../pages/wages/SalaryReports";
+import WPSFiles from "../pages/reports/WPSFiles";
+import FinalSettlement from "../pages/payroll/FinalSettlement";
+import DayMaster from "../pages/dayMaster/DayMaster";
+import SubMaster from "../pages/subMaster/SubMaster";
+import Tools from "../pages/tools/Tools";
 
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
+          {/* Dashboard */}
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           
-          {/* Employees Routes */}
+          {/* Employee Routes */}
           <Route path="/employees/new" element={<EmployeeRegistration />} />
           <Route path="/employees/appointment" element={<StaffAppointment />} />
           
-          {/* Documents Routes */}
+          {/* Document Routes */}
           <Route path="/documents/register" element={<DocumentRegister />} />
           <Route path="/documents/new" element={<NewDocument />} />
           <Route path="/documents/summary" element={<DocumentSummary />} />
           <Route path="/documents/update" element={<DocumentUpdate />} />
           
-          {/* HR & Payroll Routes */}
-          <Route path="/hr/staff" element={<StaffDetails />} />
-          <Route path="/hr/visa-passport" element={<VisaPassport />} />
-          <Route path="/hr/timesheet" element={<Timesheet />} />
-          <Route path="/hr/payroll" element={<Payroll />} />
+          {/* Leave Routes */}
           <Route path="/hr/leave-management" element={<LeaveManagement />} />
-          <Route path="/hr/salary-reports" element={<SalaryReports />} />
-          <Route path="/hr/wps" element={<WPSFiles />} />
+          
+          {/* Attendance Routes */}
+          <Route path="/hr/timesheet" element={<Timesheet />} />
+          
+          {/* Payroll Routes */}
+          <Route path="/hr/payroll" element={<Payroll />} />
           <Route path="/hr/final-settlement" element={<FinalSettlement />} />
+          
+          {/* Wages Routes */}
+          <Route path="/hr/salary-reports" element={<SalaryReports />} />
+          
+          {/* Reports Routes */}
+          <Route path="/hr/staff" element={<StaffDetails />} />
+          <Route path="/hr/wps" element={<WPSFiles />} />
+          
+          {/* Day Master */}
+          <Route path="/day-master" element={<DayMaster />} />
+          
+          {/* Sub Master */}
+          <Route path="/sub-master" element={<SubMaster />} />
+          
+          {/* Tools */}
+          <Route path="/tools" element={<Tools />} />
         </Route>
       </Routes>
     </BrowserRouter>

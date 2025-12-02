@@ -39,6 +39,12 @@ const Dashboard: FC = () => {
     (state) => state.dashboard
   );
 
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   // Map icon names to actual icon components
   const iconMap: Record<string, ReactElement> = {
     PeopleIcon: <PeopleIcon />,
@@ -82,7 +88,7 @@ const Dashboard: FC = () => {
             fontSize: { xs: "0.85rem", sm: "0.95rem", md: "1rem" },
           }}
         >
-          Welcome to HRMS Dashboard • November 30, 2025
+          {`Welcome to HRMS Dashboard • ${currentDate}`}
         </Typography>
       </Box>
 
