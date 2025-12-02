@@ -3,6 +3,7 @@ import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import DateInput from "./DateInput";
 import FileInput from "./FileInput";
+import CheckboxInput from "./CheckboxInput";
 
 interface FormField {
   name: string;
@@ -42,6 +43,10 @@ const FormFieldSelector: FC<FormFieldSelectorProps> = ({ field }) => {
         required={field.required}
       />
     );
+  }
+
+  if (field.type === "checkbox") {
+    return <CheckboxInput label={field.label} required={field.required} />;
   }
 
   // Default: text or email
