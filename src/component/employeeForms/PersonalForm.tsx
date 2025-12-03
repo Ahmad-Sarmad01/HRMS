@@ -134,21 +134,21 @@ const PersonalForm: FC = () => {
 
   return (
     <Box>
-      <FormGrid fields={addressFields} lable="Address" />
+      <FormGrid fields={addressFields} label="Address" />
       <Box sx={{ mb: 4 }} />
 
       <Grid container spacing={2}>
         <Grid size={{ md: 8, xs: 12 }}>
           <FormGrid
             fields={homeCountryAddressFields}
-            lable="Home Country Address"
+            label="Home Country Address"
             columns={2}
           />
         </Grid>
         <Grid size={{ md: 4, xs: 12 }}>
           <FormGrid
             fields={emergencyContactFields}
-            lable="Emergency Contact"
+            label="Emergency Contact"
             columns={2}
           />
         </Grid>
@@ -158,12 +158,12 @@ const PersonalForm: FC = () => {
         <Grid size={{ md: 4, xs: 12 }}>
           <FormGrid
             fields={additionalInformationFields}
-            lable="Additional Information"
+            label="Additional Information"
             columns={2}
           />
         </Grid>
         <Grid size={{ md: 8, xs: 12 }}>
-          <FormGrid fields={provisioningFields} lable="Provisioning" />
+          <FormGrid fields={provisioningFields} label="Provisioning" />
         </Grid>
       </Grid>
       <Box sx={{ mb: 4 }} />

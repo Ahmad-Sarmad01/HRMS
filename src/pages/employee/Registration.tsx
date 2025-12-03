@@ -118,7 +118,7 @@ const EmployeeRegistration: FC = () => {
           mt: 3,
           border: "1px solid #E5E7EB",
           borderRadius: 2,
-          // backgroundColor: "#FFFFFF",
+          backgroundColor: "#FFFFFF",
         }}
       >
         <Tabs

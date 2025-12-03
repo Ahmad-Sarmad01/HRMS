@@ -15,14 +15,23 @@ interface FormField {
 
 interface FormGridProps {
   fields: FormField[];
-  lable?: string;
+  label?: string;
   columns?: 2 | 3 | 4;
 }
 
-const FormGrid: FC<FormGridProps> = ({ fields, lable, columns = 3 }) => {
+const FormGrid: FC<FormGridProps> = ({ fields, label, columns = 3 }) => {
+  const containerSx = label
+    ? {
+        p: 2,
+        border: "1px solid #E5E7EB",
+        borderRadius: 2,
+        backgroundColor: "#FAFAFA",
+      }
+    : {};
+
   return (
-    <Box>
-      {lable && (
+    <Box sx={containerSx}>
+      {label && (
         <Typography
           variant="h6"
           sx={{
@@ -32,7 +41,7 @@ const FormGrid: FC<FormGridProps> = ({ fields, lable, columns = 3 }) => {
             fontSize: "1.1rem",
           }}
         >
-          {lable}
+          {label}
         </Typography>
       )}
       <Grid container spacing={2} width={"100%"} alignItems="center">
