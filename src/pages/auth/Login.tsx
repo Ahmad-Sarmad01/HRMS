@@ -11,37 +11,54 @@ const Login: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    setError("");
+const handleLogin = async () => {
+  setError("");
 
-    if (!email || !password) {
-      setError("Please fill in all fields");
+  if (!email || !password) {
+    setError("Please fill in all fields");
+    return;
+  }
+
+  try {
+    const response = await fetch("https://mechrisoft.com/mechriapi/userlogin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mobile: email,     // backend expects "mobile"
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("Login response:", data);
+
+    if (!data.isSuccess) {
+      setError(data.message || "Invalid credentials");
       return;
     }
 
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      setError("No account found. Please sign up first.");
-      return;
-    }
+    // Store token & user
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.data));
+    localStorage.setItem("isAuthenticated", "true");
 
-    const user = JSON.parse(storedUser);
+    // Update Redux
+    dispatch(
+      loginUser({
+        name: data.data.name,
+        email: data.data.email,
+      })
+    );
 
-    if (user.email === email && user.password === password) {
-      dispatch(loginUser({ name: user.name, email: user.email }));
+    navigate("/");
+  } catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ name: user.name, email: user.email, password: user.password })
-      );
-
-      localStorage.setItem("isAuthenticated", "true");
-
-      navigate("/");
-    } else {
-      setError("Invalid email or password");
-    }
-  };
 
   return (
     <Box
@@ -100,8 +117,8 @@ const Login: FC = () => {
         {/* Email Field */}
         <TextField
           fullWidth
-          label="Email"
-          type="email"
+          label="Mobile Number"
+          type="text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           sx={{
