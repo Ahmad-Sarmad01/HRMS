@@ -1,5 +1,13 @@
 import { FC, useState } from "react";
-import { Box, Tabs, Tab, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import BadgeIcon from "@mui/icons-material/Badge";
 import PersonIcon from "@mui/icons-material/Person";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -117,7 +125,7 @@ const EmployeeRegistration: FC = () => {
         {TopPillButtonData.map((e, i) => {
           const Icon = e.icon;
           const isLastButton = i === TopPillButtonData.length - 1;
-          
+
           return (
             <Box
               key={i}
@@ -125,10 +133,7 @@ const EmployeeRegistration: FC = () => {
               onMouseEnter={isLastButton ? handleMenuOpen : undefined}
               onMouseLeave={isLastButton ? handleMenuClose : undefined}
             >
-              <PillButton
-                index={i}
-                onClick={(index) => setActiveBtn(index)}
-              >
+              <PillButton index={i} onClick={(index) => setActiveBtn(index)}>
                 <Icon />
                 {e.title}
               </PillButton>
