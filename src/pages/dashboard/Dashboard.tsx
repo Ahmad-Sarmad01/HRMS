@@ -1,21 +1,14 @@
-import { FC, ReactElement, cloneElement } from "react";
+import { FC, ReactElement, useState } from "react";
 import {
   Box,
   Card,
   CardContent,
   Grid,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
-  Chip,
-  Paper,
   useMediaQuery,
   useTheme,
+  IconButton,
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import WarningIcon from "@mui/icons-material/Warning";
@@ -24,25 +17,28 @@ import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AddIcon from "@mui/icons-material/Add";
-import ReceiptIcon from "@mui/icons-material/Receipt";
 import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
+import CloseIcon from "@mui/icons-material/Close";
 import { useAppSelector } from "../../store/hooks";
+import DetailTable from "../../component/dashboardDetails/DetailTable";
+import { CardType, getCardData } from "../../data/dashboardData";
 
 const Dashboard: FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
-  // Get data from Redux store
-  const { statisticsCards, expiredDocuments, loading, error } = useAppSelector(
-    (state) => state.dashboard
+  // State for selected card
+  const [selectedCard, setSelectedCard] = useState<CardType | null>(
+    "Documents Expiring Soon"
   );
 
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
+  // Get data from Redux store
+  const { statisticsCards } = useAppSelector((state) => state.dashboard);
+
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 
   // Map icon names to actual icon components
@@ -55,35 +51,32 @@ const Dashboard: FC = () => {
     InsertDriveFileIcon: <InsertDriveFileIcon />,
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Critical":
-        return "error";
-      case "Expiring Soon":
-        return "warning";
-      default:
-        return "default";
-    }
+  // Handle card click
+  const handleCardClick = (cardTitle: string) => {
+    setSelectedCard(cardTitle as CardType);
   };
+
+  // Get data for selected card
+  const selectedCardData = selectedCard ? getCardData(selectedCard) : [];
 
   return (
     <Box sx={{ width: "100%" }}>
       {/* Page Header with Responsive Typography */}
       <Box sx={{ mb: { xs: 3, sm: 4, md: 4 } }}>
-        <Typography 
-          variant="h2" 
-          sx={{ 
-            fontWeight: 700, 
-            color: "#011527", 
+        <Typography
+          variant="h2"
+          sx={{
+            fontWeight: 700,
+            color: "#011527",
             mb: { xs: 0.5, sm: 1 },
             fontSize: { xs: "1.75rem", sm: "2rem", md: "2.5rem" },
           }}
         >
           Dashboard
         </Typography>
-        <Typography 
+        <Typography
           variant="body2"
-          sx={{ 
+          sx={{
             color: "#86764e",
             fontSize: { xs: "0.85rem", sm: "0.95rem", md: "1rem" },
           }}
@@ -93,40 +86,62 @@ const Dashboard: FC = () => {
       </Box>
 
       {/* Statistics Cards Grid - Fully Responsive */}
-      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 3, sm: 4, md: 4 } }}>
+      <Grid
+        container
+        spacing={{ xs: 1.5, sm: 2, md: 2.5 }}
+        sx={{ mb: { xs: 3, sm: 4, md: 4 } }}
+      >
         {statisticsCards.map((card, index) => (
           <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={index}>
             <Card
+              onClick={() => handleCardClick(card.title)}
               sx={{
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+                boxShadow:
+                  selectedCard === card.title
+                    ? "0 8px 16px rgba(217, 196, 140, 0.3)"
+                    : "0 2px 8px rgba(0, 0, 0, 0.08)",
+                border:
+                  selectedCard === card.title
+                    ? "2px solid #D9C48C"
+                    : "2px solid transparent",
+                cursor: "pointer",
                 "&:hover": {
-                  boxShadow: isMobile ? "0 4px 12px rgba(0, 0, 0, 0.1)" : "0 8px 16px rgba(0, 0, 0, 0.12)",
+                  boxShadow: isMobile
+                    ? "0 4px 12px rgba(0, 0, 0, 0.1)"
+                    : "0 8px 16px rgba(0, 0, 0, 0.12)",
                   transform: isMobile ? "translateY(-2px)" : "translateY(-4px)",
                 },
                 backgroundColor: "#FFFFFF",
               }}
             >
               <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.5 } }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    mb: 2,
+                  }}
+                >
                   <Box>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: "#86764e", 
-                        fontWeight: 500, 
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#86764e",
+                        fontWeight: 500,
                         mb: 0.75,
                         fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.9rem" },
                       }}
                     >
                       {card.title}
                     </Typography>
-                    <Typography 
-                      sx={{ 
-                        fontWeight: 700, 
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
                         color: "#011527",
                         fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2rem" },
                       }}
@@ -135,7 +150,14 @@ const Dashboard: FC = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ opacity: 0.8 }}>
-                    <Box sx={{ fontSize: { xs: 32, sm: 36, md: 40 }, color: card.color, display: "flex", alignItems: "center" }}>
+                    <Box
+                      sx={{
+                        fontSize: { xs: 32, sm: 36, md: 40 },
+                        color: card.color,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       {iconMap[card.icon] || <PeopleIcon />}
                     </Box>
                   </Box>
@@ -154,151 +176,51 @@ const Dashboard: FC = () => {
         ))}
       </Grid>
 
-      {/* Documents Expiring Soon Section - Fully Responsive */}
-      <Card
-        sx={{
-          mb: { xs: 3, sm: 4, md: 4 },
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-          backgroundColor: "#FFFFFF",
-        }}
-      >
-        <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.5 } }}>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              fontWeight: 700, 
-              color: "#011527", 
-              mb: { xs: 1.5, sm: 2 },
-              fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" },
-            }}
-          >
-            Documents Expiring Soon
-          </Typography>
-          <TableContainer 
-            component={Paper} 
-            sx={{ 
-              boxShadow: "none", 
-              border: "1px solid #E5E7EB",
-              overflowX: { xs: "auto", md: "hidden" },
-              "&::-webkit-scrollbar": {
-                height: "6px",
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "#F0F0F0",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#D9C48C",
-                borderRadius: "3px",
-              },
-            }}
-          >
-            <Table size={isMobile ? "small" : "medium"}>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#FAFAFA" }}>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: "#011527",
-                      fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
-                      p: { xs: 1, sm: 1.5, md: 2 },
-                    }}
-                  >
-                    Document
-                  </TableCell>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: "#011527",
-                      fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
-                      p: { xs: 1, sm: 1.5, md: 2 },
-                      display: { xs: "none", sm: "table-cell" },
-                    }}
-                  >
-                    Employee
-                  </TableCell>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: "#011527",
-                      fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
-                      p: { xs: 1, sm: 1.5, md: 2 },
-                    }}
-                  >
-                    Expiry
-                  </TableCell>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: "#011527",
-                      fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
-                      p: { xs: 1, sm: 1.5, md: 2 },
-                    }}
-                  >
-                    Status
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {expiredDocuments.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    sx={{
-                      "&:hover": { backgroundColor: "rgba(217, 196, 140, 0.05)" },
-                      borderBottom: "1px solid #E5E7EB",
-                    }}
-                  >
-                    <TableCell 
-                      sx={{ 
-                        color: "#011527", 
-                        fontWeight: 500,
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                        p: { xs: 1, sm: 1.5, md: 2 },
-                      }}
-                    >
-                      {row.docName}
-                    </TableCell>
-                    <TableCell 
-                      sx={{ 
-                        color: "#011527",
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                        p: { xs: 1, sm: 1.5, md: 2 },
-                        display: { xs: "none", sm: "table-cell" },
-                      }}
-                    >
-                      {row.employee}
-                    </TableCell>
-                    <TableCell 
-                      sx={{ 
-                        color: "#011527",
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                        p: { xs: 1, sm: 1.5, md: 2 },
-                      }}
-                    >
-                      {row.expiryDate}
-                    </TableCell>
-                    <TableCell
-                      sx={{ 
-                        fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
-                        p: { xs: 1, sm: 1.5, md: 2 },
-                      }}
-                    >
-                      <Chip
-                        label={row.status}
-                        color={getStatusColor(row.status)}
-                        size={isMobile ? "small" : "medium"}
-                        sx={{
-                          fontWeight: 600,
-                          "& .MuiChip-label": { px: { xs: 0.5, sm: 1 } },
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </CardContent>
-      </Card>
+      {/* Detail Table Section - Dynamic based on selected card */}
+      {selectedCard && (
+        <Card
+          sx={{
+            mb: { xs: 3, sm: 4, md: 4 },
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.5 } }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 1.5, sm: 2 },
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: "#011527",
+                  fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" },
+                }}
+              >
+                {selectedCard}
+              </Typography>
+              <IconButton
+                onClick={() => setSelectedCard(null)}
+                size="small"
+                sx={{
+                  color: "#86764e",
+                  "&:hover": {
+                    backgroundColor: "rgba(217, 196, 140, 0.1)",
+                  },
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <DetailTable cardType={selectedCard} data={selectedCardData} />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions Section - Fully Responsive */}
       <Card
@@ -308,11 +230,11 @@ const Dashboard: FC = () => {
         }}
       >
         <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.5 } }}>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              fontWeight: 700, 
-              color: "#011527", 
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: "#011527",
               mb: { xs: 1.5, sm: 2, md: 2.5 },
               fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" },
             }}

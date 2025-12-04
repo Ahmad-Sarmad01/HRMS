@@ -118,7 +118,7 @@ const Topbar = ({
               color: "#c7b078",
               fontWeight: 600,
               cursor: "pointer",
-              fontSize: { xs: "1rem", sm: "1.5rem" },
+              fontSize: { xs: "0.9rem", sm: "1rem" },
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
