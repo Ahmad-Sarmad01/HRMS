@@ -109,9 +109,9 @@ const EmployeeRegistration: FC = () => {
           );
         })}
       </Box>
-      
+
       <PrimaryForm />
-      
+
       {/* Tabs Section */}
       <Box
         sx={{
@@ -124,6 +124,8 @@ const EmployeeRegistration: FC = () => {
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
           sx={{
             borderBottom: "1px solid #E5E7EB",
             "& .MuiTab-root": {
@@ -144,15 +146,23 @@ const EmployeeRegistration: FC = () => {
         >
           <Tab icon={<BadgeIcon />} iconPosition="start" label="Official" />
           <Tab icon={<PersonIcon />} iconPosition="start" label="Personal" />
-          <Tab icon={<DescriptionIcon />} iconPosition="start" label="Documents" />
+          <Tab
+            icon={<DescriptionIcon />}
+            iconPosition="start"
+            label="Documents"
+          />
           <Tab icon={<InfoIcon />} iconPosition="start" label="General" />
           <Tab icon={<PeopleIcon />} iconPosition="start" label="Dependant" />
           <Tab icon={<BeachAccessIcon />} iconPosition="start" label="Leave" />
-          <Tab icon={<AccountBalanceWalletIcon />} iconPosition="start" label="Finance" />
+          <Tab
+            icon={<AccountBalanceWalletIcon />}
+            iconPosition="start"
+            label="Finance"
+          />
           <Tab icon={<PaidIcon />} iconPosition="start" label="Payroll" />
           <Tab icon={<MoreHorizIcon />} iconPosition="start" label="Others" />
         </Tabs>
-        
+
         <Box sx={{ p: 3 }}>
           {tabValue === 0 && <OfficialForm />}
           {tabValue === 1 && <PersonalForm />}

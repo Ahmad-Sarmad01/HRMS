@@ -1,13 +1,354 @@
-import { FC } from "react";
+import { FC, useState } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+  Paper,
+  IconButton,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import IconButtonPrimary from "../buttons/iconButtonPrimary";
 import FormGrid from "./FormGrid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPaginationModel,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
+
+interface AllowanceItem {
+  id: string;
+  allowances: string;
+  amount: string;
+}
 
 const PayrollForm: FC = () => {
-  const fields = [
-    { name: "salaryStructure", label: "Salary Structure", type: "select", fieldSize: "normal", options: ["Monthly","Hourly"], required: false },
-    { name: "basicSalary", label: "Basic Salary", type: "text", fieldSize: "normal", required: false },
+  // Salary fields
+  const salaryFields = [
+    {
+      name: "basicSalary",
+      label: "Basic Salary",
+      type: "text",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "ministrySalary",
+      label: "Ministry Salary",
+      type: "text",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "grossSalary",
+      label: "Gross Salary",
+      type: "text",
+      fieldSize: "normal",
+      required: false,
+    },
   ];
 
-  return <FormGrid fields={fields}/>;
+  // Contract Details fields
+  const contractDetailsFields = [
+    {
+      name: "accommodationAmount",
+      label: "Accommodation Amount",
+      type: "text",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "startDate1",
+      label: "Start Date",
+      type: "date",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "endDate1",
+      label: "End Date",
+      type: "date",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "educationalReimbursement",
+      label: "Educational Reimbursement",
+      type: "text",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "startDate2",
+      label: "Start Date",
+      type: "date",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "endDate2",
+      label: "End Date",
+      type: "date",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "remarks",
+      label: "Remarks",
+      type: "text",
+      fieldSize: "large",
+      required: false,
+    },
+  ];
+
+  // Bank Details fields
+  const bankDetailsFields = [
+    {
+      name: "creditAccount",
+      label: "Credit Account",
+      type: "select",
+      fieldSize: "normal",
+      options: ["Account 1", "Account 2"],
+      required: false,
+    },
+    {
+      name: "ibanNo",
+      label: "IBAN No",
+      type: "text",
+      fieldSize: "normal",
+      required: false,
+    },
+    {
+      name: "employeeBank",
+      label: "Employee Bank",
+      type: "select",
+      fieldSize: "normal",
+      options: ["Bank A", "Bank B", "Bank C"],
+      required: false,
+    },
+  ];
+
+  // Allowance State
+  const [allowanceRows, setAllowanceRows] = useState<AllowanceItem[]>([]);
+  const [allowanceOpen, setAllowanceOpen] = useState(false);
+  const [selectedAllowance, setSelectedAllowance] = useState("");
+  const [allowanceAmount, setAllowanceAmount] = useState("");
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 5,
+  });
+
+  // Allowance Columns
+  const allowanceColumns: GridColDef[] = [
+    { field: "allowances", headerName: "Allowances", flex: 1, minWidth: 200 },
+    { field: "amount", headerName: "Amount", flex: 1, minWidth: 150 },
+    {
+      field: "actions",
+      headerName: "Action",
+      sortable: false,
+      filterable: false,
+      width: 80,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <IconButton
+            size="small"
+            onClick={() => handleAllowanceDelete(params.row.id)}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        );
+      },
+    },
+  ];
+
+  // Allowance Handlers
+  const handleAllowanceOpen = () => setAllowanceOpen(true);
+  const handleAllowanceClose = () => {
+    setAllowanceOpen(false);
+    setSelectedAllowance("");
+    setAllowanceAmount("");
+  };
+
+  const handleAllowanceAdd = () => {
+    if (!selectedAllowance || !allowanceAmount) return;
+    const newItem: AllowanceItem = {
+      id: Date.now().toString(),
+      allowances: selectedAllowance,
+      amount: allowanceAmount,
+    };
+    setAllowanceRows((prev) => [newItem, ...prev]);
+    handleAllowanceClose();
+  };
+
+  const handleAllowanceDelete = (id: string) => {
+    setAllowanceRows((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const CustomNoRowsOverlay = ({ message }: { message: string }) => (
+    <Box
+      sx={{
+        display: "flex",
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Typography color="text.secondary">{message}</Typography>
+    </Box>
+  );
+
+  return (
+    <Box>
+      {/* Top Section - 3 Columns on md+ */}
+      <Box
+        sx={{
+          p: 2,
+          border: "1px solid #E5E7EB",
+          borderRadius: 2,
+          backgroundColor: "#FAFAFA",
+        }}
+      >
+        <Grid container spacing={2}>
+          {/* Salary Section */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 2,
+                  fontWeight: 700,
+                  color: "#011527",
+                  fontSize: "1.1rem",
+                }}
+              >
+                Salary
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {salaryFields.map((field) => (
+                  <TextField
+                    key={field.name}
+                    label={field.label}
+                    fullWidth
+                    size="small"
+                  />
+                ))}
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* DataGrid Section */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 2,
+                  fontWeight: 700,
+                  color: "#011527",
+                  fontSize: "1.1rem",
+                }}
+              >
+                Allowances
+              </Typography>
+              <Paper sx={{ height: 150, width: "100%" }}>
+                <DataGrid
+                  rows={allowanceRows}
+                  columns={allowanceColumns}
+                  initialState={{
+                    pagination: { paginationModel },
+                  }}
+                  pageSizeOptions={[5, 10]}
+                  sx={{ border: 0 }}
+                  onPaginationModelChange={(model: GridPaginationModel) =>
+                    setPaginationModel(model)
+                  }
+                  slots={{
+                    noRowsOverlay: () => (
+                      <CustomNoRowsOverlay message="No records to display" />
+                    ),
+                  }}
+                />
+              </Paper>
+            </Box>
+          </Grid>
+
+          {/* Allowance Input Section */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 2,
+                  fontWeight: 700,
+                  color: "#011527",
+                  fontSize: "1.1rem",
+                }}
+              >
+                Add Allowance
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Select Allowance</InputLabel>
+                  <Select
+                    value={selectedAllowance}
+                    onChange={(e) => setSelectedAllowance(e.target.value)}
+                    label="Select Allowance"
+                    size="small"
+                  >
+                    <MenuItem value="Housing Allowance">
+                      Housing Allowance
+                    </MenuItem>
+                    <MenuItem value="Transport Allowance">
+                      Transport Allowance
+                    </MenuItem>
+                    <MenuItem value="Food Allowance">Food Allowance</MenuItem>
+                    <MenuItem value="Medical Allowance">
+                      Medical Allowance
+                    </MenuItem>
+                    <MenuItem value="Other Allowance">Other Allowance</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Amount"
+                  value={allowanceAmount}
+                  onChange={(e) => setAllowanceAmount(e.target.value)}
+                  fullWidth
+                  size="small"
+                />
+                <IconButtonPrimary
+                  icon={<AddIcon />}
+                  label="Update Allowance"
+                  onClick={handleAllowanceAdd}
+                />
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+      {/* Contract Details Section */}
+      <Box sx={{ mt: 3 }}>
+        <FormGrid fields={contractDetailsFields} label="Contract Details" />
+      </Box>
+
+      {/* Bank Details Section */}
+      <Box sx={{ mt: 3 }}>
+        <FormGrid fields={bankDetailsFields} label="Bank Details" />
+      </Box>
+    </Box>
+  );
 };
 
 export default PayrollForm;
