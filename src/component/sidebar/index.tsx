@@ -13,9 +13,11 @@ import {
   useMediaQuery,
   Divider,
   Button,
+  IconButton,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { menuSections } from "./content";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { logoutUser } from "../../store/slices/userSlice";
@@ -26,6 +28,7 @@ const expandedWidth = 240;
 const Sidebar = ({ isOpen }: { isOpen: any }) => {
   const theme = useTheme();
   const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
+  const [hoverOpen, setHoverOpen] = useState<boolean>(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -35,6 +38,14 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
     dispatch(logoutUser());
     clearAuthData();
     navigate("/login");
+  };
+
+  const handleSidebarOpen = () => {
+    setHoverOpen(true);
+  };
+
+  const handleSidebarClose = () => {
+    setHoverOpen(false);
   };
 
   const handleDropdownClick = (menu: any) => {
@@ -48,6 +59,8 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
       return updated;
     });
   };
+
+  const isSidebarOpen = isOpen || hoverOpen;
 
   const renderMenuItem = (item: any, level: number = 0) => {
     const marginLeft = level * 2.5;
@@ -97,7 +110,9 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
       return (
         <Box key={item.key}>
           <ListItemButton
-            onClick={() => (isOpen ? handleDropdownClick(item.key) : null)}
+            onClick={() =>
+              isSidebarOpen ? handleDropdownClick(item.key) : null
+            }
             sx={{
               transition: "all 0.3s ease",
               borderRadius: 1.5,
@@ -106,7 +121,7 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
               my: 0.6,
               px: 1.5,
               py: 1.2,
-              justifyContent: isOpen ? "flex-start" : "center",
+              justifyContent: isSidebarOpen ? "flex-start" : "center",
               backgroundColor: openDropdowns.has(item.key)
                 ? "rgba(217, 196, 140, 0.18)"
                 : "transparent",
@@ -117,7 +132,7 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
                 color: openDropdowns.has(item.key)
                   ? "primary.main"
                   : "text.primary",
-                minWidth: isOpen ? 40 : 0,
+                minWidth: isSidebarOpen ? 40 : 0,
               },
               "& .MuiListItemText-primary": {
                 fontWeight: openDropdowns.has(item.key) ? 600 : 500,
@@ -136,10 +151,10 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
               {" "}
               {item.icon}{" "}
             </ListItemIcon>
-            {isOpen && (
+            {isSidebarOpen && (
               <ListItemText primary={item.title} sx={{ flexGrow: 1 }} />
             )}
-            {isOpen && (
+            {isSidebarOpen && (
               <ExpandMoreIcon
                 sx={{
                   transform: openDropdowns.has(item.key)
@@ -202,88 +217,122 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
   };
 
   return (
-    <Drawer
-      variant="permanent"
-      open={isOpen}
-      sx={{
-        position: isMobile ? "absolute" : "sticky",
-        width: isOpen ? expandedWidth : 0,
-        transition: "width 0.3s ease",
-        "& .MuiDrawer-paper": {
-          width: isOpen ? expandedWidth : 0,
-          overflowX: "hidden",
-          transition: "width 0.3s ease",
-          borderRight: "1px solid #E5E7EB",
-          backgroundColor: "#FAFAFA",
-        },
-      }}
-    >
-      <Toolbar
-        sx={{
-          mt: isMobile ? 8.5 : 0,
-          display: "flex",
-          justifyContent: isOpen ? "space-between" : "center",
-          px: 0.5,
-          position: "sticky",
-          top: 0,
-          zIndex: 1100,
-          backgroundColor: "white",
-          borderBottom: "1px solid #E5E7EB",
-        }}
-      >
-        {isOpen && (
-          <img
-            src="/Mechri-Logo.png"
-            alt="Mechri Logo"
-            style={{
-              height: 40,
-              width: "auto",
-              objectFit: "contain",
-              marginTop: 10,
-            }}
-          />
-        )}
-      </Toolbar>
-
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <List
+    <>
+      {/* Floating Toggle Button */}
+      {!isSidebarOpen && (
+        <IconButton
+          onMouseEnter={handleSidebarOpen}
           sx={{
-            p: 0.5,
-            flexGrow: 1,
-            "& .MuiListItemButton-root": {
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            position: "fixed",
+            left: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: 32,
+            height: 48,
+            borderRadius: "0 24px 24px 0",
+            backgroundColor: "#D9C48C",
+            color: "white",
+            zIndex: 1300,
+            transition: "all 0.3s ease",
+            boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+            "&:hover": {
+              backgroundColor: "#B8A361",
+              width: 36,
+              boxShadow: "3px 0 12px rgba(0,0,0,0.2)",
+            },
+            "& .MuiSvgIcon-root": {
+              fontSize: "1.2rem",
             },
           }}
         >
-          {menuSections.map((item) => renderMenuItem(item, 0))}
-        </List>
+          <ChevronRightIcon />
+        </IconButton>
+      )}
 
-        {/* Logout Button */}
-        {isOpen && user.isAuthenticated && (
-          <Box sx={{ p: 1.5, borderTop: "1px solid #E5E7EB" }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<LogoutIcon />}
-              onClick={handleLogout}
-              sx={{
-                color: "#011527",
-                borderColor: "#E5E7EB",
-                textTransform: "none",
-                fontWeight: 500,
-                py: 1,
-                "&:hover": {
-                  borderColor: "#D9C48C",
-                  backgroundColor: "rgba(217, 196, 140, 0.08)",
-                },
+      <Drawer
+        variant="permanent"
+        open={isSidebarOpen}
+        onMouseLeave={hoverOpen ? handleSidebarClose : undefined}
+        sx={{
+          position: isMobile ? "absolute" : "sticky",
+          width: isSidebarOpen ? expandedWidth : 0,
+          transition: "width 0.3s ease",
+          "& .MuiDrawer-paper": {
+            width: isSidebarOpen ? expandedWidth : 0,
+            overflowX: "hidden",
+            transition: "width 0.3s ease",
+            borderRight: "1px solid #E5E7EB",
+            backgroundColor: "#FAFAFA",
+          },
+        }}
+      >
+        <Toolbar
+          sx={{
+            mt: isMobile ? 8.5 : 0,
+            display: "flex",
+            justifyContent: isSidebarOpen ? "space-between" : "center",
+            px: 0.5,
+            position: "sticky",
+            top: 0,
+            zIndex: 1100,
+            backgroundColor: "white",
+            borderBottom: "1px solid #E5E7EB",
+          }}
+        >
+          {isSidebarOpen && (
+            <img
+              src="/Mechri-Logo.png"
+              alt="Mechri Logo"
+              style={{
+                height: 40,
+                width: "auto",
+                objectFit: "contain",
+                marginTop: 10,
               }}
-            >
-              Logout
-            </Button>
-          </Box>
-        )}
-      </Box>
-    </Drawer>
+            />
+          )}
+        </Toolbar>
+
+        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <List
+            sx={{
+              p: 0.5,
+              flexGrow: 1,
+              "& .MuiListItemButton-root": {
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              },
+            }}
+          >
+            {menuSections.map((item) => renderMenuItem(item, 0))}
+          </List>
+
+          {/* Logout Button */}
+          {isSidebarOpen && user.isAuthenticated && (
+            <Box sx={{ p: 1.5, borderTop: "1px solid #E5E7EB" }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<LogoutIcon />}
+                onClick={handleLogout}
+                sx={{
+                  color: "#011527",
+                  borderColor: "#E5E7EB",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  py: 1,
+                  "&:hover": {
+                    borderColor: "#D9C48C",
+                    backgroundColor: "rgba(217, 196, 140, 0.08)",
+                  },
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
+          )}
+        </Box>
+      </Drawer>
+    </>
   );
 };
 
