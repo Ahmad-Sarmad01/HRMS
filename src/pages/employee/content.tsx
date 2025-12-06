@@ -1,4 +1,12 @@
-import { Plus, Save, FilePenLine, X, ArrowLeft, Search, Menu } from 'lucide-react';
+import {
+  Plus,
+  Save,
+  FilePenLine,
+  X,
+  ArrowLeft,
+  Search,
+  Menu,
+} from "lucide-react";
 
 const TopPillButtonData = [
   {
@@ -14,10 +22,6 @@ const TopPillButtonData = [
     title: "Edit",
   },
   {
-    icon: X,
-    title: "Cancel",
-  },
-  {
     icon: ArrowLeft,
     title: "Back",
   },
@@ -31,4 +35,4 @@ const TopPillButtonData = [
   },
 ];
 
-export {TopPillButtonData}
+export { TopPillButtonData };

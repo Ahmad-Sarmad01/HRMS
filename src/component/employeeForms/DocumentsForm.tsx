@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import {
   Box,
   Button,
@@ -32,7 +33,13 @@ interface DocumentItem {
   issuePlace: string;
 }
 
-const DocumentsForm: FC = () => {
+interface DocumentsFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const DocumentsForm = <T extends FieldValues>({
+  control,
+}: DocumentsFormProps<T>) => {
   const [rows, setRows] = useState<DocumentItem[]>([]);
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("Passport");

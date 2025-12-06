@@ -1,33 +1,60 @@
 import { FC } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import FormGrid from "../formFields/FormGrid";
 
-const OfficialForm: FC = () => {
+interface OfficialFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const OfficialForm = <T extends FieldValues>({
+  control,
+}: OfficialFormProps<T>) => {
   const fields = [
     { name: "dateOfBirth", label: "Date of Birth", type: "date" },
     { name: "age", label: "Age", type: "text" },
-    { name: "gender", label: "Gender", type: "select", options: [] },
+    {
+      name: "gender",
+      label: "Gender",
+      type: "select",
+      options: ["Male", "Female", "Other"],
+    },
 
-    { name: "visaType", label: "Visa Type", type: "select", options: [] },
-    { name: "section", label: "Section", type: "select", options: [] },
-    { name: "visaSponsor", label: "Visa Sponsor", type: "select", options: [] },
+    {
+      name: "visaType",
+      label: "Visa Type",
+      type: "select",
+      options: ["Work", "Resident", "Visit"],
+    },
+    {
+      name: "section",
+      label: "Section",
+      type: "select",
+      options: ["Administration", "Finance", "Operations"],
+    },
+    {
+      name: "visaSponsor",
+      label: "Visa Sponsor",
+      type: "select",
+      options: ["Company", "Self", "Family"],
+    },
 
     {
       name: "employmentType",
       label: "Employment Type",
       type: "select",
-      options: [],
+      options: ["Permanent", "Contract", "Temporary"],
     },
     {
       name: "lineManager1",
       label: "Line Manager 1",
       type: "select",
-      options: [],
+      options: ["Manager A", "Manager B", "Manager C"],
     },
     {
       name: "lineManager2",
       label: "Line Manager 2",
       type: "select",
-      options: [],
+      options: ["Manager D", "Manager E", "Manager F"],
     },
 
     { name: "probationDays", label: "Probation Days", type: "text" },
@@ -36,19 +63,24 @@ const OfficialForm: FC = () => {
       name: "visaDesignation",
       label: "Visa Designation",
       type: "select",
-      options: [],
+      options: ["Teacher", "Administrator", "Technician"],
     },
 
     { name: "resignationDate", label: "Resignation Date", type: "date" },
     { name: "noticePeriod", label: "Notice Period", type: "text" },
     { name: "lastWorkingDate", label: "Last Working Date", type: "date" },
 
-    { name: "adekStatus", label: "ADEK Status", type: "select", options: [] },
+    {
+      name: "adekStatus",
+      label: "ADEK Status",
+      type: "select",
+      options: ["Registered", "Pending", "Not Registered"],
+    },
     {
       name: "adekDesignation",
       label: "ADEK Designation",
       type: "select",
-      options: [],
+      options: ["Primary", "Secondary", "Other"],
     },
     { name: "currentGrade", label: "Current Grade", type: "text" },
 
@@ -60,19 +92,29 @@ const OfficialForm: FC = () => {
       name: "labourCardStatus",
       label: "Labour Card Status",
       type: "select",
-      options: [],
+      options: ["Active", "Expired", "Pending"],
     },
     { name: "speciality", label: "Speciality", type: "text" },
-    { name: "position", label: "Position", type: "select", options: [] },
+    {
+      name: "position",
+      label: "Position",
+      type: "select",
+      options: ["Staff", "Supervisor", "Manager"],
+    },
 
     {
       name: "additionalResponsibility",
       label: "Additional Responsibility",
       type: "select",
-      options: [],
+      options: ["Coordinator", "Mentor", "Safety Officer"],
     },
     { name: "rfid", label: "RFID", type: "text" },
-    { name: "religion", label: "Religion", type: "select", options: [] },
+    {
+      name: "religion",
+      label: "Religion",
+      type: "select",
+      options: ["Islam", "Christianity", "Hinduism", "Other"],
+    },
 
     { name: "emiratesIdNo", label: "Emirates ID No", type: "text" },
     {
@@ -82,8 +124,18 @@ const OfficialForm: FC = () => {
     },
     { name: "moeRegistrationNo", label: "MOE Registration No", type: "text" },
 
-    { name: "approvedFor", label: "Approved For", type: "select", options: [] },
-    { name: "tlsStatus", label: "TLS Status", type: "select", options: [] },
+    {
+      name: "approvedFor",
+      label: "Approved For",
+      type: "select",
+      options: ["All", "Shift A", "Shift B"],
+    },
+    {
+      name: "tlsStatus",
+      label: "TLS Status",
+      type: "select",
+      options: ["Valid", "Expired", "Not Required"],
+    },
     { name: "tlsExpiryDate", label: "TLS Expiry Date", type: "date" },
 
     { name: "seniorityNo", label: "Seniority No", type: "text" },
@@ -93,7 +145,7 @@ const OfficialForm: FC = () => {
     { name: "signature", label: "Signature", type: "file" },
   ];
 
-  return <FormGrid fields={fields} />;
+  return <FormGrid fields={fields} control={control} />;
 };
 
 export default OfficialForm;

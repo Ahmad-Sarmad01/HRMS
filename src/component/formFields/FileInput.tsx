@@ -1,27 +1,24 @@
 import { FC, useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, FormHelperText } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
-interface FileInputProps {
+interface FileInputProps<T extends FieldValues> {
+  name: Path<T>;
+  control: Control<T>;
   label: string;
   accept?: string[];
   required?: boolean;
-  onChange?: (file: File | null) => void;
 }
 
-const FileInput: FC<FileInputProps> = ({
+const FileInput = <T extends FieldValues>({
+  name,
+  control,
   label,
   accept = [],
   required = false,
-  onChange,
-}) => {
+}: FileInputProps<T>) => {
   const [fileName, setFileName] = useState<string>("");
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFileName(file?.name || "");
-    onChange?.(file);
-  };
 
   return (
     <Box display="flex" flexDirection="column">
@@ -37,35 +34,53 @@ const FileInput: FC<FileInputProps> = ({
         {label}
         {required && <span style={{ color: "#D32F2F" }}> *</span>}
       </Typography>
-      <Button
-        component="label"
-        variant="outlined"
-        fullWidth
-        startIcon={<UploadFileIcon />}
-        sx={{
-          mt: 0.5,
-          borderRadius: 2,
-          backgroundColor: "#FFFFFF",
-          border: "1px solid #E5E7EB",
-          color: "#011527",
-          fontWeight: 500,
-          padding: "10px 12px",
-          textTransform: "none",
-          justifyContent: "flex-start",
-          "&:hover": {
-            borderColor: "#D9C48C",
-            backgroundColor: "#FFFFFF",
-          },
-        }}
-      >
-        {fileName || "Choose file"}
-        <input
-          type="file"
-          hidden
-          accept={accept.join(",")}
-          onChange={handleFileChange}
-        />
-      </Button>
+      <Controller
+        name={name}
+        control={control}
+        rules={{ required: required ? `${label} is required` : false }}
+        render={({
+          field: { onChange, value, ...field },
+          fieldState: { error },
+        }) => (
+          <>
+            <Button
+              component="label"
+              variant="outlined"
+              fullWidth
+              startIcon={<UploadFileIcon />}
+              sx={{
+                mt: 0.5,
+                borderRadius: 2,
+                backgroundColor: "#FFFFFF",
+                border: `1px solid ${error ? "#D32F2F" : "#E5E7EB"}`,
+                color: "#011527",
+                fontWeight: 500,
+                padding: "10px 12px",
+                textTransform: "none",
+                justifyContent: "flex-start",
+                "&:hover": {
+                  borderColor: error ? "#D32F2F" : "#D9C48C",
+                  backgroundColor: "#FFFFFF",
+                },
+              }}
+            >
+              {fileName || "Choose file"}
+              <input
+                {...field}
+                type="file"
+                hidden
+                accept={accept.join(",")}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  setFileName(file?.name || "");
+                  onChange(file?.name || "");
+                }}
+              />
+            </Button>
+            {error && <FormHelperText error>{error.message}</FormHelperText>}
+          </>
+        )}
+      />
     </Box>
   );
 };

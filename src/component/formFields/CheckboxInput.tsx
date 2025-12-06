@@ -1,37 +1,53 @@
 import { FC } from "react";
-import { FormControlLabel, Checkbox, Box, Typography } from "@mui/material";
+import {
+  FormControlLabel,
+  Checkbox,
+  Box,
+  Typography,
+  FormHelperText,
+} from "@mui/material";
+import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
-interface CheckboxInputProps {
+interface CheckboxInputProps<T extends FieldValues> {
+  name: Path<T>;
+  control: Control<T>;
   label: string;
   required?: boolean;
-  checked?: boolean;
-  onChange?: (checked: boolean) => void;
 }
 
-const CheckboxInput: FC<CheckboxInputProps> = ({
+const CheckboxInput = <T extends FieldValues>({
+  name,
+  control,
   label,
   required = false,
-  checked = false,
-  onChange,
-}) => {
+}: CheckboxInputProps<T>) => {
   return (
-    <Box display="flex" alignItems="center">
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={checked}
-            onChange={(e) => onChange?.(e.target.checked)}
-            sx={{ color: "#011527", "&.Mui-checked": { color: "#D9C48C" } }}
+    <Controller
+      name={name}
+      control={control}
+      rules={{ required: required ? `${label} is required` : false }}
+      render={({ field, fieldState: { error } }) => (
+        <Box display="flex" flexDirection="column">
+          <FormControlLabel
+            control={
+              <Checkbox
+                {...field}
+                checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                sx={{ color: "#011527", "&.Mui-checked": { color: "#D9C48C" } }}
+              />
+            }
+            label={
+              <Typography sx={{ fontWeight: 600, color: "#011527" }}>
+                {label}
+                {required && <span style={{ color: "#D32F2F" }}> *</span>}
+              </Typography>
+            }
           />
-        }
-        label={
-          <Typography sx={{ fontWeight: 600, color: "#011527" }}>
-            {label}
-            {required && <span style={{ color: "#D32F2F" }}> *</span>}
-          </Typography>
-        }
-      />
-    </Box>
+          {error && <FormHelperText error>{error.message}</FormHelperText>}
+        </Box>
+      )}
+    />
   );
 };
 

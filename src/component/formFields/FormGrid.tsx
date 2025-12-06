@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Box, Grid, Typography } from "@mui/material";
+import { Control, FieldValues } from "react-hook-form";
 import FormFieldSelector from "./FormFieldSelector";
 
 interface FormField {
@@ -13,13 +14,19 @@ interface FormField {
   placeholder?: string;
 }
 
-interface FormGridProps {
+interface FormGridProps<T extends FieldValues> {
   fields: FormField[];
+  control?: Control<T>;
   label?: string;
   columns?: 2 | 3 | 4;
 }
 
-const FormGrid: FC<FormGridProps> = ({ fields, label, columns = 3 }) => {
+const FormGrid = <T extends FieldValues>({
+  fields,
+  control,
+  label,
+  columns = 3,
+}: FormGridProps<T>) => {
   const containerSx = label
     ? {
         p: 2,
@@ -65,7 +72,11 @@ const FormGrid: FC<FormGridProps> = ({ fields, label, columns = 3 }) => {
 
               return (
                 <Grid size={{ md: mdSize, sm: 6, xs: 12 }} key={field.name}>
-                  <FormFieldSelector field={field} />
+                  {control ? (
+                    <FormFieldSelector field={field} control={control} />
+                  ) : (
+                    <div>{field.label} (No control provided)</div>
+                  )}
                 </Grid>
               );
             })}

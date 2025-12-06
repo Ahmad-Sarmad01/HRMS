@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import {
   Box,
   Button,
@@ -33,7 +34,13 @@ interface AllowanceItem {
   amount: string;
 }
 
-const PayrollForm: FC = () => {
+interface PayrollFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const PayrollForm = <T extends FieldValues>({
+  control,
+}: PayrollFormProps<T>) => {
   // Salary fields
   const salaryFields = [
     {
@@ -340,12 +347,20 @@ const PayrollForm: FC = () => {
       </Box>
       {/* Contract Details Section */}
       <Box sx={{ mt: 3 }}>
-        <FormGrid fields={contractDetailsFields} label="Contract Details" />
+        <FormGrid
+          fields={contractDetailsFields}
+          control={control}
+          label="Contract Details"
+        />
       </Box>
 
       {/* Bank Details Section */}
       <Box sx={{ mt: 3 }}>
-        <FormGrid fields={bankDetailsFields} label="Bank Details" />
+        <FormGrid
+          fields={bankDetailsFields}
+          control={control}
+          label="Bank Details"
+        />
       </Box>
     </Box>
   );

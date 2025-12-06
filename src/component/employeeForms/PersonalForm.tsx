@@ -1,8 +1,15 @@
 import { FC } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import FormGrid from "../formFields/FormGrid";
 import { Box, Grid } from "@mui/material";
 
-const PersonalForm: FC = () => {
+interface PersonalFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const PersonalForm = <T extends FieldValues>({
+  control,
+}: PersonalFormProps<T>) => {
   const addressFields = [
     {
       name: "flatNoBuildingName",
@@ -134,13 +141,14 @@ const PersonalForm: FC = () => {
 
   return (
     <Box>
-      <FormGrid fields={addressFields} label="Address" />
+      <FormGrid fields={addressFields} control={control} label="Address" />
       <Box sx={{ mb: 4 }} />
 
       <Grid container spacing={2}>
         <Grid size={{ md: 8, xs: 12 }}>
           <FormGrid
             fields={homeCountryAddressFields}
+            control={control}
             label="Home Country Address"
             columns={2}
           />
@@ -148,6 +156,7 @@ const PersonalForm: FC = () => {
         <Grid size={{ md: 4, xs: 12 }}>
           <FormGrid
             fields={emergencyContactFields}
+            control={control}
             label="Emergency Contact"
             columns={2}
           />
@@ -158,12 +167,17 @@ const PersonalForm: FC = () => {
         <Grid size={{ md: 4, xs: 12 }}>
           <FormGrid
             fields={additionalInformationFields}
+            control={control}
             label="Additional Information"
             columns={2}
           />
         </Grid>
         <Grid size={{ md: 8, xs: 12 }}>
-          <FormGrid fields={provisioningFields} label="Provisioning" />
+          <FormGrid
+            fields={provisioningFields}
+            control={control}
+            label="Provisioning"
+          />
         </Grid>
       </Grid>
       <Box sx={{ mb: 4 }} />

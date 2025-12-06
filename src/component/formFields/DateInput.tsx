@@ -1,19 +1,20 @@
 import { FC } from "react";
 import { Box, Typography, TextField } from "@mui/material";
+import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
-interface DateInputProps {
+interface DateInputProps<T extends FieldValues> {
+  name: Path<T>;
+  control: Control<T>;
   label: string;
   required?: boolean;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const DateInput: FC<DateInputProps> = ({
+const DateInput = <T extends FieldValues>({
+  name,
+  control,
   label,
   required = false,
-  value,
-  onChange,
-}) => {
+}: DateInputProps<T>) => {
   return (
     <Box display="flex" flexDirection="column">
       <Typography
@@ -28,32 +29,46 @@ const DateInput: FC<DateInputProps> = ({
         {label}
         {required && <span style={{ color: "#D32F2F" }}> *</span>}
       </Typography>
-      <TextField
-        type="date"
-        value={value}
-        onChange={onChange}
-        fullWidth
-        sx={{
-          mt: 0.5,
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 2,
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E5E7EB",
-            "&:hover fieldset": {
-              borderColor: "#D9C48C",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: "#D9C48C",
-              borderWidth: 2,
-            },
-          },
-          "& .MuiInputBase-input": {
-            fontSize: "0.95rem",
-            color: "#011527",
-            padding: "10px 12px",
-            fontWeight: 500,
-          },
-        }}
+      <Controller
+        name={name}
+        control={control}
+        rules={{ required: required ? `${label} is required` : false }}
+        render={({ field, fieldState: { error } }) => (
+          <TextField
+            {...field}
+            type="date"
+            fullWidth
+            error={!!error}
+            helperText={error?.message}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              placeholder: "yyyy-MM-dd",
+            }}
+            sx={{
+              mt: 0.5,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor: "#FFFFFF",
+                border: "1px solid #E5E7EB",
+                "&:hover fieldset": {
+                  borderColor: "#D9C48C",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#D9C48C",
+                  borderWidth: 2,
+                },
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "0.95rem",
+                color: "#011527",
+                padding: "10px 12px",
+                fontWeight: 500,
+              },
+            }}
+          />
+        )}
       />
     </Box>
   );

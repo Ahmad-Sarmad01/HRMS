@@ -1,10 +1,15 @@
-import { FC } from "react";
-import FormGrid from "../formFields/FormGrid";
+import { Control, FieldValues } from "react-hook-form";
 import { Box, Grid } from "@mui/material";
 import FormFieldSelector from "../formFields/FormFieldSelector";
 import ImageInput from "../formFields/ImageInput";
 
-const PrimaryForm: FC = () => {
+interface PrimaryFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const PrimaryForm = <T extends FieldValues>({
+  control,
+}: PrimaryFormProps<T>) => {
   const fields = [
     {
       name: "staffCode",
@@ -33,7 +38,7 @@ const PrimaryForm: FC = () => {
       label: "Branch",
       type: "select",
       fieldSize: "normal",
-      options: [],
+      options: ["Head Office", "Branch A", "Branch B"],
       required: true,
     },
     {
@@ -48,7 +53,7 @@ const PrimaryForm: FC = () => {
       label: "Designation",
       type: "select",
       fieldSize: "normal",
-      options: [],
+      options: ["Manager", "Senior Staff", "Junior Staff"],
       required: true,
     },
     {
@@ -56,7 +61,7 @@ const PrimaryForm: FC = () => {
       label: "Sub Status",
       type: "select",
       fieldSize: "normal",
-      options: [],
+      options: ["Probation", "Confirmed", "Contract"],
       required: false,
     },
     {
@@ -64,7 +69,7 @@ const PrimaryForm: FC = () => {
       label: "Department",
       type: "select",
       fieldSize: "normal",
-      options: [],
+      options: ["IT", "HR", "Finance", "Operations"],
       required: true,
     },
     {
@@ -72,7 +77,7 @@ const PrimaryForm: FC = () => {
       label: "Employee Category",
       type: "select",
       fieldSize: "normal",
-      options: [],
+      options: ["Full-Time", "Part-Time", "Contractor"],
       required: false,
     },
     {
@@ -80,7 +85,7 @@ const PrimaryForm: FC = () => {
       label: "Nationality",
       type: "select",
       fieldSize: "normal",
-      options: [],
+      options: ["UAE", "India", "Pakistan", "Philippines", "Other"],
       required: true,
     },
     {
@@ -88,7 +93,7 @@ const PrimaryForm: FC = () => {
       label: "UAE Mobile No",
       type: "text",
       fieldSize: "normal",
-      inputMode: "numeric",
+      inputMode: "numeric" as const,
       maxLength: 10,
       required: true,
     },
@@ -134,7 +139,7 @@ const PrimaryForm: FC = () => {
                   size={{ md: isLarge ? 6 : 3, sm: 6, xs: 12 }}
                   key={field.name}
                 >
-                  <FormFieldSelector field={field} />
+                  <FormFieldSelector field={field} control={control} />
                 </Grid>
               );
             })}
@@ -152,7 +157,12 @@ const PrimaryForm: FC = () => {
               alignItems: "flex-start",
             }}
           >
-            <ImageInput label="Employee Photo" required={false} />
+            <ImageInput
+              name={"uploadPhotoName" as any}
+              control={control}
+              label="Employee Photo"
+              required={false}
+            />
           </Box>
         </Grid>
       </Grid>

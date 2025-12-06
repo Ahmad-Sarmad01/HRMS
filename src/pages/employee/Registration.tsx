@@ -1,4 +1,6 @@
 import { FC, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Tabs,
@@ -7,7 +9,12 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Button,
+  CircularProgress,
+  Alert,
+  Snackbar,
 } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
 import BadgeIcon from "@mui/icons-material/Badge";
 import PersonIcon from "@mui/icons-material/Person";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -34,12 +41,35 @@ import {
   PayrollForm,
   OthersForm,
 } from "../../component/employeeForms";
+import {
+  getDefaultFormValues,
+  convertToAPIFormat,
+} from "../../utils/fieldMapping";
+import { employeeService } from "../../services/employeeService";
 
 const EmployeeRegistration: FC = () => {
-  const [activeBtn, setActiveBtn] = useState<number>(0); // track active button index
-  const [tabValue, setTabValue] = useState<number>(0); // track active tab
+  const navigate = useNavigate();
+  const [activeBtn, setActiveBtn] = useState<number>(0);
+  const [tabValue, setTabValue] = useState<number>(0);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
+
   const menuOpen = Boolean(menuAnchorEl);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: getDefaultFormValues(),
+    mode: "onBlur",
+  });
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -56,6 +86,59 @@ const EmployeeRegistration: FC = () => {
   const handleMenuItemClick = (action: string) => {
     console.log(`${action} clicked`);
     handleMenuClose();
+  };
+
+  const onSubmit = async (data: any) => {
+    try {
+      setIsSubmitting(true);
+      const apiData = convertToAPIFormat(data);
+
+      console.log("Submitting data:", apiData);
+      const response = await employeeService.createEmployee(apiData as any);
+
+      setSnackbar({
+        open: true,
+        message: "Employee registered successfully!",
+        severity: "success",
+      });
+
+      // Reset form after successful submission
+      reset();
+      setTabValue(0);
+
+      console.log("Response:", response);
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      setSnackbar({
+        open: true,
+        message:
+          error.message || "Failed to register employee. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handlePillButtonClick = (index: number, title: string) => {
+    setActiveBtn(index);
+
+    if (title === "New") {
+      // Clear form to new
+      reset();
+      setTabValue(0);
+    } else if (title === "Save") {
+      // Trigger form submission
+      handleSubmit(onSubmit)();
+    } else if (title === "Back") {
+      // Navigate to dashboard
+      navigate("/dashboard");
+    }
+    // Handle other buttons (Edit, Search) as needed
   };
 
   const PillButton = ({
@@ -105,11 +188,10 @@ const EmployeeRegistration: FC = () => {
   };
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Box
         gap={1}
         height={40}
-        // width="100%"
         boxShadow="0 2px 6px rgba(0,0,0,0.05)"
         borderRadius={2}
         p={1}
@@ -133,7 +215,10 @@ const EmployeeRegistration: FC = () => {
               onMouseEnter={isLastButton ? handleMenuOpen : undefined}
               onMouseLeave={isLastButton ? handleMenuClose : undefined}
             >
-              <PillButton index={i} onClick={(index) => setActiveBtn(index)}>
+              <PillButton
+                index={i}
+                onClick={(index) => handlePillButtonClick(index, e.title)}
+              >
                 <Icon />
                 {e.title}
               </PillButton>
@@ -268,7 +353,7 @@ const EmployeeRegistration: FC = () => {
         </MenuItem>
       </Menu>
 
-      <PrimaryForm />
+      <PrimaryForm control={control} />
 
       {/* Tabs Section */}
       <Box
@@ -322,18 +407,34 @@ const EmployeeRegistration: FC = () => {
         </Tabs>
 
         <Box sx={{ p: 3 }}>
-          {tabValue === 0 && <OfficialForm />}
-          {tabValue === 1 && <PersonalForm />}
-          {tabValue === 2 && <DocumentsForm />}
-          {tabValue === 3 && <GeneralForm />}
-          {tabValue === 4 && <DependantForm />}
-          {tabValue === 5 && <LeaveForm />}
-          {tabValue === 6 && <FinanceForm />}
-          {tabValue === 7 && <PayrollForm />}
-          {tabValue === 8 && <OthersForm />}
+          {tabValue === 0 && <OfficialForm control={control} />}
+          {tabValue === 1 && <PersonalForm control={control} />}
+          {tabValue === 2 && <DocumentsForm control={control} />}
+          {tabValue === 3 && <GeneralForm control={control} />}
+          {tabValue === 4 && <DependantForm control={control} />}
+          {tabValue === 5 && <LeaveForm control={control} />}
+          {tabValue === 6 && <FinanceForm control={control} />}
+          {tabValue === 7 && <PayrollForm control={control} />}
+          {tabValue === 8 && <OthersForm control={control} />}
         </Box>
       </Box>
-    </>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </form>
   );
 };
 

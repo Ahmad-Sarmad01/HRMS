@@ -1,7 +1,14 @@
 import { FC } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import FormGrid from "../formFields/FormGrid";
 
-const FinanceForm: FC = () => {
+interface FinanceFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const FinanceForm = <T extends FieldValues>({
+  control,
+}: FinanceFormProps<T>) => {
   const fields = [
     {
       name: "paymentType",
@@ -111,7 +118,7 @@ const FinanceForm: FC = () => {
     },
   ];
 
-  return <FormGrid fields={fields} />;
+  return <FormGrid fields={fields} control={control} />;
 };
 
 export default FinanceForm;

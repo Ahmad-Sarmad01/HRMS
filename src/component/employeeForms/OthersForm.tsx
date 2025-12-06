@@ -1,8 +1,13 @@
 import { FC } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import { Box } from "@mui/material";
 import FormGrid from "../formFields/FormGrid";
 
-const OthersForm: FC = () => {
+interface OthersFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const OthersForm = <T extends FieldValues>({ control }: OthersFormProps<T>) => {
   const extraDetailsFields = [
     {
       name: "staffNameAsPerPassport",
@@ -308,13 +313,18 @@ const OthersForm: FC = () => {
 
   return (
     <Box>
-      <FormGrid fields={extraDetailsFields} label="Extra Details" />
+      <FormGrid
+        fields={extraDetailsFields}
+        control={control}
+        label="Extra Details"
+      />
       <Box sx={{ mt: 3 }}>
-        <FormGrid fields={benefitsFields} label="Benefits" />
+        <FormGrid fields={benefitsFields} control={control} label="Benefits" />
       </Box>
       <Box sx={{ mt: 3 }}>
         <FormGrid
           fields={cancellationDetailsFields}
+          control={control}
           label="Cancellation Details"
           columns={2}
         />
@@ -322,5 +332,4 @@ const OthersForm: FC = () => {
     </Box>
   );
 };
-
 export default OthersForm;

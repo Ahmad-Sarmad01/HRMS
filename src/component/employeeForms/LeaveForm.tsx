@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import {
   Box,
   Button,
@@ -33,7 +34,11 @@ interface LeaveItem {
   status: string;
 }
 
-const LeaveForm: FC = () => {
+interface LeaveFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const LeaveForm = <T extends FieldValues>({ control }: LeaveFormProps<T>) => {
   // Leave State
   const [leaveRows, setLeaveRows] = useState<LeaveItem[]>([]);
   const [leaveOpen, setLeaveOpen] = useState(false);
@@ -269,6 +274,7 @@ const LeaveForm: FC = () => {
       {/* Leave Section with FormGrid */}
       <Box sx={{ mt: 4 }}>
         <FormGrid
+          control={control}
           label="Leave"
           fields={[
             {

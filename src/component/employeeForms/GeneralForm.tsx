@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import {
   Box,
   Button,
@@ -43,7 +44,13 @@ interface ExperienceItem {
   experience: string;
 }
 
-const GeneralForm: FC = () => {
+interface GeneralFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const GeneralForm = <T extends FieldValues>({
+  control,
+}: GeneralFormProps<T>) => {
   const [qualificationSummary, setQualificationSummary] = useState("");
   const [internalExperience, setInternalExperience] = useState("");
 

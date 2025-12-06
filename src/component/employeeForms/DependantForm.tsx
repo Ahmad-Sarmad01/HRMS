@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { Control, FieldValues } from "react-hook-form";
 import {
   Box,
   Button,
@@ -37,7 +38,13 @@ interface DependantItem {
   remarks: string;
 }
 
-const DependantForm: FC = () => {
+interface DependantFormProps<T extends FieldValues> {
+  control: Control<T>;
+}
+
+const DependantForm = <T extends FieldValues>({
+  control,
+}: DependantFormProps<T>) => {
   // Dependant State
   const [dependantRows, setDependantRows] = useState<DependantItem[]>([]);
   const [dependantOpen, setDependantOpen] = useState(false);
