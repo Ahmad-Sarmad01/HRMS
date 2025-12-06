@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box } from "@mui/material";
-import FormGrid from "./FormGrid";
+import FormGrid from "../formFields/FormGrid";
 
 const OthersForm: FC = () => {
   const extraDetailsFields = [

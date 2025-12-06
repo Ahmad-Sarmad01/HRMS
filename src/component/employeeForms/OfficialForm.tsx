@@ -1,5 +1,5 @@
 import { FC } from "react";
-import FormGrid from "./FormGrid";
+import FormGrid from "../formFields/FormGrid";
 
 const OfficialForm: FC = () => {
   const fields = [
@@ -88,9 +88,9 @@ const OfficialForm: FC = () => {
 
     { name: "seniorityNo", label: "Seniority No", type: "text" },
     { name: "actualJoiningDate", label: "Actual Joining Date", type: "date" },
-    { name: "remarks", label: "Remarks", type: "text"},
+    { name: "remarks", label: "Remarks", type: "text" },
 
-    { name: "signature", label: "Signature", type: "file"},
+    { name: "signature", label: "Signature", type: "file" },
   ];
 
   return <FormGrid fields={fields} />;

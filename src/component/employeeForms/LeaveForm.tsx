@@ -14,7 +14,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import IconButtonPrimary from "../buttons/iconButtonPrimary";
-import FormGrid from "./FormGrid";
+import FormGrid from "../formFields/FormGrid";
 import {
   DataGrid,
   GridColDef,

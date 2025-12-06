@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import FormFieldSelector from "../formFields/FormFieldSelector";
+import FormFieldSelector from "./FormFieldSelector";
 
 interface FormField {
   name: string;
@@ -56,7 +56,7 @@ const FormGrid: FC<FormGridProps> = ({ fields, label, columns = 3 }) => {
               // Calculate mdSize based on columns prop
               let mdSize: number;
               if (isSmall) {
-                mdSize = columns === 2 ? 3 : 2;
+                mdSize = columns === 2 ? 3 : columns === 3 ? 2 : 1.5;
               } else if (isLarge) {
                 mdSize = columns === 2 ? 12 : columns === 3 ? 8 : 6;
               } else {

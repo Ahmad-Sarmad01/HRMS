@@ -1,5 +1,5 @@
 import { FC } from "react";
-import FormGrid from "./FormGrid";
+import FormGrid from "../formFields/FormGrid";
 
 const FinanceForm: FC = () => {
   const fields = [

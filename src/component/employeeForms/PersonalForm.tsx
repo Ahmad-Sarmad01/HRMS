@@ -1,5 +1,5 @@
 import { FC } from "react";
-import FormGrid from "./FormGrid";
+import FormGrid from "../formFields/FormGrid";
 import { Box, Grid } from "@mui/material";
 
 const PersonalForm: FC = () => {
