@@ -88,37 +88,97 @@ const EmployeeRegistration: FC = () => {
     handleMenuClose();
   };
 
-  const onSubmit = async (data: any) => {
-    try {
-      setIsSubmitting(true);
-      const apiData = convertToAPIFormat(data);
+const onSubmit = async (data: any) => {
+  try {
+    setIsSubmitting(true);
 
-      console.log("Submitting data:", apiData);
-      const response = await employeeService.createEmployee(apiData as any);
+    // Group the form data according to your internal form sections
+    const fullFormData = {
+      // Primary Info
+      employeeName: data.employeeName ?? "",
+      staffCode: data.staffCode ?? "",
+      branch: data.branch ?? "",
+      department: data.department ?? "",
+      personalEmail: data.personalEmail ?? "",
+      nationalityCountry: data.nationalityCountry ?? "",
+      religion: data.religion ?? "",
+      maritalStatus: data.maritalStatus ?? "",
 
-      setSnackbar({
-        open: true,
-        message: "Employee registered successfully!",
-        severity: "success",
-      });
+      // Official Info
+      designation: data.designation ?? "",
+      joiningDate: data.joiningDate ?? "",
+      employeeCategory: data.employeeCategory ?? "",
+      officialEmail: data.officialEmail ?? "",
+      status: data.status ?? "",
+      employmentType: data.employmentType ?? "",
+      probationDays: data.probationDays ?? "",
+      resignationDate: data.resignationDate ?? "",
+      adekStatus: data.adekStatus ?? "",
+      contractExpiryDate: data.contractExpiryDate ?? "",
+      labourCardStatus: data.labourCardStatus ?? "",
+      addResponsibility: data.addResponsibility ?? "",
+      lineManager1: data.lineManager1 ?? "",
+      lineManager2: data.lineManager2 ?? "",
+      probationEndDate: data.probationEndDate ?? "",
+      noticePeriod: data.noticePeriod ?? "",
+      adekDesignation: data.adekDesignation ?? "",
+      currentGrade: data.currentGrade ?? "",
+      position: data.position ?? "",
+      specialty: data.specialty ?? "",
+      rfid: data.rfid ?? "",
 
-      // Reset form after successful submission
-      reset();
-      setTabValue(0);
+      // Personal Info
+      arabicName: data.arabicName ?? "",
+      uploadPhotoName: data.uploadPhotoName ?? "",
+      idCard: data.idCard ?? "",
+      dateOfBirth: data.dateOfBirth ?? "",
+      emiratesIdNo: data.emiratesIdNo ?? "",
+      emiratesIdExpiryDate: data.emiratesIdExpiryDate ?? "",
+      actualJoiningDate: data.actualJoiningDate ?? "",
+      gender: data.gender ?? "",
+      visaSponsor: data.visaSponsor ?? "",
+      visaDesignation: data.visaDesignation ?? "",
+      lastWorkingDate: data.lastWorkingDate ?? "",
+      modifiedBy: data.modifiedBy ?? "",
+      modifiedDate: data.modifiedDate ?? "",
+      tlsStatus: data.tlsStatus ?? "",
+      tlsExpiryDate: data.tlsExpiryDate ?? "",
+      remarks: data.remarks ?? "",
+      signature: data.signature ?? "",
+      moeRegistrationNo: data.moeRegistrationNo ?? "",
+      companyID: data.companyID ?? "",
+    };
 
-      console.log("Response:", response);
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-      setSnackbar({
-        open: true,
-        message:
-          error.message || "Failed to register employee. Please try again.",
-        severity: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    // Convert to API format (maps keys to backend keys)
+    const apiBody = convertToAPIFormat(fullFormData);
+
+    console.log("Submitting data:", apiBody);
+
+    const response = await employeeService.createEmployee(apiBody as any);
+
+    setSnackbar({
+      open: true,
+      message: "Employee registered successfully!",
+      severity: "success",
+    });
+
+    reset();
+    setTabValue(0);
+
+    console.log("Response:", response);
+  } catch (error: any) {
+    console.error("Error submitting form:", error);
+    setSnackbar({
+      open: true,
+      message:
+        error.message || "Failed to register employee. Please try again.",
+      severity: "error",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
@@ -215,13 +275,14 @@ const EmployeeRegistration: FC = () => {
               onMouseEnter={isLastButton ? handleMenuOpen : undefined}
               onMouseLeave={isLastButton ? handleMenuClose : undefined}
             >
-              <PillButton
-                index={i}
-                onClick={(index) => handlePillButtonClick(index, e.title)}
-              >
-                <Icon />
-                {e.title}
-              </PillButton>
+            <PillButton
+              index={i}
+              onClick={(index) => handlePillButtonClick(index, e.title)}
+            >
+              {isSubmitting && <CircularProgress size={16} sx={{ mr: 0.5 }} />}
+              <Icon />
+              {e.title}
+            </PillButton>
             </Box>
           );
         })}

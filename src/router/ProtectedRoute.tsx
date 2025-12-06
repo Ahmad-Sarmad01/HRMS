@@ -9,9 +9,9 @@ interface ProtectedRouteProps {
 const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
   const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return children;
 };

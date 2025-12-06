@@ -3,7 +3,7 @@ import { EmployeeFormData } from "../types/employee";
 const API_BASE_URL = "https://mechrisoft.com/mechriapi";
 
 export const employeeService = {
-  async createEmployee(data: EmployeeFormData): Promise<any> {
+  async createEmployee(data: any): Promise<any> {
     try {
       const response = await fetch(`${API_BASE_URL}/postemployee`, {
         method: "POST",
@@ -15,7 +15,9 @@ export const employeeService = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          JSON.stringify(errorData.errors || errorData || "Unknown error")
+        );
       }
 
       return await response.json();

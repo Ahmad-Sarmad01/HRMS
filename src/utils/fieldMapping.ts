@@ -1,137 +1,152 @@
 import { EmployeeFormData } from "../types/employee";
 
-// Map form field names to API field names
+// Map frontend form fields to backend API fields
 export const fieldNameMapping: Record<string, keyof EmployeeFormData> = {
-  // Primary Form Fields
+  // Primary Info
+  employeeName: "staff_Name",
   staffCode: "staff_Code",
-  staffName: "staff_Name",
-  status: "status",
   branch: "branch",
-  joiningDate: "joining_Date",
-  designation: "designation",
-  subStatus: "sub_Status",
   department: "department",
-  employeeCategory: "employee_Category",
-  nationality: "nationality",
-  uaeMobileNo: "uaE_Mobile_No",
   personalEmail: "personal_Email",
+  nationalityCountry: "nationality",
+  religion: "religion",
+  maritalStatus: "sub_Status",
+  uaeMobileNo: "uaE_Mobile_No",
+
+  // Official Info
+  designation: "designation",
+  joiningDate: "joining_Date",
+  employeeCategory: "employee_Category",
   officialEmail: "official_Email",
-  arabicName: "arabic_Name",
-  uploadPhotoName: "upload_Photo_Name",
-  
-  // Official Form Fields
-  dateOfBirth: "date_Of_Birth",
-  age: "age",
-  gender: "gender",
-  visaType: "visa_Type",
-  section: "section",
-  visaSponsor: "visa_Sponsor",
+  status: "status",
   employmentType: "employment_Type",
-  lineManager1: "line_Manager1",
-  lineManager2: "line_Manager2",
   probationDays: "probation_Days",
-  probationEndDate: "probation_End_Date",
-  visaDesignation: "visa_Designation",
   resignationDate: "resignation_Date",
-  noticePeriod: "notice_Period",
-  lastWorkingDate: "last_Working_Date",
   adekStatus: "adeK_Status",
   adekDesignation: "adeK_Designation",
-  currentGrade: "current_Grade",
   contractExpiryDate: "contract_Expiry_Date",
-  modifiedBy: "modified_By",
-  modifiedDate: "modified_Date",
   labourCardStatus: "labour_Card_Status",
-  speciality: "specialty",
+  addResponsibility: "add_Responsibility",
+  lineManager1: "line_Manager1",
+  lineManager2: "line_Manager2",
+  probationEndDate: "probation_End_Date",
+  noticePeriod: "notice_Period",
+  currentGrade: "current_Grade",
   position: "position",
-  additionalResponsibility: "add_Responsibility",
+  specialty: "specialty",
   rfid: "rfid",
-  religion: "religion",
+
+  // Personal Info
+  arabicName: "arabic_Name",
+  uploadPhotoName: "upload_Photo_Name",
+  idCard: "iD_Card",
+  dateOfBirth: "date_Of_Birth",
   emiratesIdNo: "emiratesID_No",
   emiratesIdExpiryDate: "emiratesID_Expiry_Date",
-  moeRegistrationNo: "moE_Registration_No",
-  approvedFor: "approved_For",
+  actualJoiningDate: "actual_Joining_Date",
+  gender: "gender",
+  visaSponsor: "visa_Sponsor",
+  visaDesignation: "visa_Designation",
+  lastWorkingDate: "last_Working_Date",
+  modifiedBy: "modified_By",
+  modifiedDate: "modified_Date",
   tlsStatus: "tlS_Status",
   tlsExpiryDate: "tlS_Expiry_Date",
-  seniorityNo: "seniority_No",
-  actualJoiningDate: "actual_Joining_Date",
   remarks: "remarks",
   signature: "signature",
-  idCard: "iD_Card",
+  moeRegistrationNo: "moE_Registration_No",
   companyID: "companyID",
+  age: "age",
+  visaType: "visa_Type",
+  section: "section",
+  approvedFor: "approved_For",
+  seniorityNo: "seniority_No",
 };
 
-// Convert form data to API format
-export const convertToAPIFormat = (formData: Record<string, any>): Partial<EmployeeFormData> => {
+// Converts frontend form data to backend API format
+export const convertToAPIFormat = (formData: Record<string, any>): any => {
   const apiData: any = {};
-  
-  Object.entries(formData).forEach(([key, value]) => {
-    const apiKey = fieldNameMapping[key] || key;
-    // Only include fields that have values
-    if (value !== undefined && value !== null && value !== "") {
-      apiData[apiKey] = value;
+
+  const flatten = (obj: any) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      const apiKey = fieldNameMapping[key] || key;
+
+      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+        flatten(value);
+      } else {
+        apiData[apiKey] = value ?? "";
+      }
+    });
+  };
+
+  flatten(formData);
+
+  // Ensure all API keys exist
+  for (const apiKey of Object.values(fieldNameMapping)) {
+    if (!(apiKey in apiData)) {
+      apiData[apiKey] = "";
     }
-  });
-  
+  }
+
   return apiData;
 };
 
-// Get default values for the form
+// Default values for the form
 export const getDefaultFormValues = (): Partial<Record<keyof typeof fieldNameMapping, string>> => {
   return {
+    employeeName: "",
     staffCode: "",
-    staffName: "",
-    status: "",
     branch: "",
-    joiningDate: "",
-    designation: "",
-    subStatus: "",
     department: "",
-    employeeCategory: "",
-    nationality: "",
-    uaeMobileNo: "",
     personalEmail: "",
+    nationalityCountry: "",
+    religion: "",
+    maritalStatus: "",
+    uaeMobileNo: "",
+    designation: "",
+    joiningDate: "",
+    employeeCategory: "",
     officialEmail: "",
-    arabicName: "",
-    uploadPhotoName: "",
-    dateOfBirth: "",
-    age: "",
-    gender: "",
-    visaType: "",
-    section: "",
-    visaSponsor: "",
+    status: "",
     employmentType: "",
-    lineManager1: "",
-    lineManager2: "",
     probationDays: "",
-    probationEndDate: "",
-    visaDesignation: "",
     resignationDate: "",
-    noticePeriod: "",
-    lastWorkingDate: "",
     adekStatus: "",
     adekDesignation: "",
-    currentGrade: "",
     contractExpiryDate: "",
-    modifiedBy: "",
-    modifiedDate: "",
     labourCardStatus: "",
-    speciality: "",
+    addResponsibility: "",
+    lineManager1: "",
+    lineManager2: "",
+    probationEndDate: "",
+    noticePeriod: "",
+    currentGrade: "",
     position: "",
-    additionalResponsibility: "",
+    specialty: "",
     rfid: "",
-    religion: "",
+    arabicName: "",
+    uploadPhotoName: "",
+    idCard: "",
+    dateOfBirth: "",
     emiratesIdNo: "",
     emiratesIdExpiryDate: "",
-    moeRegistrationNo: "",
-    approvedFor: "",
+    actualJoiningDate: "",
+    gender: "",
+    visaSponsor: "",
+    visaDesignation: "",
+    lastWorkingDate: "",
+    modifiedBy: "",
+    modifiedDate: "",
     tlsStatus: "",
     tlsExpiryDate: "",
-    seniorityNo: "",
-    actualJoiningDate: "",
     remarks: "",
     signature: "",
-    idCard: "",
+    moeRegistrationNo: "",
     companyID: "",
+    age: "",
+    visaType: "",
+    section: "",
+    approvedFor: "",
+    seniorityNo: "",
   };
 };
