@@ -1,6 +1,6 @@
 import { EmployeeFormData } from "../types/employee";
 
-const API_BASE_URL = "/mechriapi";
+const API_BASE_URL = "https://mechrisoft.com/mechriapi";
 
 export const employeeService = {
   async createEmployee(data: EmployeeFormData): Promise<any> {
