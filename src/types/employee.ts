@@ -55,3 +55,61 @@ export interface EmployeeFormData {
   remarks: string;
   companyID: string;
 }
+
+// Employee interface to match the structure of the data returned from the GetEmployee API endpoint
+export interface Employee {
+  staff_Code: string;
+  branch: string;
+  department: string;
+  personal_Email: string;
+  staff_Name: string;
+  joining_Date: string;
+  employee_Category: string;
+  official_Email: string;
+  status: string;
+  sub_Status: string;
+  designation: string;
+  nationality: string;
+  uaE_Mobile_No: string;
+  arabic_Name: string;
+  upload_Photo_Name: string;
+  iD_Card: string;
+  date_Of_Birth: string;
+  visa_Type: string;
+  employment_Type: string;
+  probation_Days: string;
+  resignation_Date: string;
+  adeK_Status: string;
+  contract_Expiry_Date: string;
+  labour_Card_Status: string;
+  add_Responsibility: string;
+  emiratesID_No: string;
+  approved_For: string;
+  seniority_No: string;
+  signature: string;
+  age: string;
+  section: string;
+  line_Manager1: string;
+  probation_End_Date: string;
+  notice_Period: string;
+  adeK_Designation: string;
+  specialty: string;
+  rfid: string;
+  emiratesID_Expiry_Date: string;
+  tlS_Status: string;
+  actual_Joining_Date: string;
+  gender: string;
+  visa_Sponsor: string;
+  line_Manager2: string;
+  visa_Designation: string;
+  last_Working_Date: string;
+  current_Grade: string;
+  modified_By: string;
+  modified_Date: string;
+  position: string;
+  religion: string;
+  moE_Registration_No: string;
+  tlS_Expiry_Date: string;
+  remarks: string;
+  companyID: string;
+}
