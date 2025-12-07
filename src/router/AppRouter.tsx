@@ -17,6 +17,7 @@ import FinalSettlement from "../pages/payroll/FinalSettlement";
 import DayMaster from "../pages/dayMaster/DayMaster";
 import SubMaster from "../pages/subMaster/SubMaster";
 import Tools from "../pages/tools/Tools";
+import BackendTest from "../pages/tools/BackendTest";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ProtectedRoute from "./ProtectedRoute";
@@ -75,6 +76,7 @@ const AppRouter = () => {
 
           {/* Tools */}
           <Route path="/tools" element={<Tools />} />
+          <Route path="/tools/backend-test" element={<BackendTest />} />
         </Route>
       </Routes>
     </BrowserRouter>

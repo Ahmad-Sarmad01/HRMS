@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -46,6 +46,7 @@ import {
   convertToAPIFormat,
 } from "../../utils/fieldMapping";
 import { employeeService } from "../../services/employeeService";
+import { setupService, SetupOption } from "../../services/setupService";
 
 const EmployeeRegistration: FC = () => {
   const navigate = useNavigate();
@@ -59,6 +60,42 @@ const EmployeeRegistration: FC = () => {
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
 
+  // Setup options state
+  const [setupOptions, setSetupOptions] = useState<{
+    status: SetupOption[];
+    branch: SetupOption[];
+    designation: SetupOption[];
+    subStatus: SetupOption[];
+    nationality: SetupOption[];
+    gender: SetupOption[];
+    visaType: SetupOption[];
+    section: SetupOption[];
+    visaSponsor: SetupOption[];
+    employmentType: SetupOption[];
+    lineManager: SetupOption[];
+    labourCardStatus: SetupOption[];
+    position: SetupOption[];
+    addResponsibility: SetupOption[];
+    religion: SetupOption[];
+  }>({
+    status: [],
+    branch: [],
+    designation: [],
+    subStatus: [],
+    nationality: [],
+    gender: [],
+    visaType: [],
+    section: [],
+    visaSponsor: [],
+    employmentType: [],
+    lineManager: [],
+    labourCardStatus: [],
+    position: [],
+    addResponsibility: [],
+    religion: [],
+  });
+  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+
   const menuOpen = Boolean(menuAnchorEl);
 
   const {
@@ -70,6 +107,44 @@ const EmployeeRegistration: FC = () => {
     defaultValues: getDefaultFormValues(),
     mode: "onBlur",
   });
+
+  // Fetch setup options on component mount
+  useEffect(() => {
+    const fetchSetupOptions = async () => {
+      try {
+        setIsLoadingOptions(true);
+        const options = await setupService.getAllSetupOptions();
+        setSetupOptions({
+          status: options.status || [],
+          branch: options.branch || [],
+          designation: options.designation || [],
+          subStatus: options.subStatus || [],
+          nationality: options.nationality || [],
+          gender: options.gender || [],
+          visaType: options.visaType || [],
+          section: options.section || [],
+          visaSponsor: options.visaSponsor || [],
+          employmentType: options.employmentType || [],
+          lineManager: options.lineManager || [],
+          labourCardStatus: options.labourCardStatus || [],
+          position: options.position || [],
+          addResponsibility: options.addResponsibility || [],
+          religion: options.religion || [],
+        });
+      } catch (error) {
+        console.error('Error loading setup options:', error);
+        setSnackbar({
+          open: true,
+          message: 'Failed to load dropdown options',
+          severity: 'error',
+        });
+      } finally {
+        setIsLoadingOptions(false);
+      }
+    };
+
+    fetchSetupOptions();
+  }, []);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -414,7 +489,20 @@ const onSubmit = async (data: any) => {
         </MenuItem>
       </Menu>
 
-      <PrimaryForm control={control} />
+      {isLoadingOptions ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <PrimaryForm
+          control={control}
+          statusOptions={setupOptions.status}
+          branchOptions={setupOptions.branch}
+          designationOptions={setupOptions.designation}
+          subStatusOptions={setupOptions.subStatus}
+          nationalityOptions={setupOptions.nationality}
+        />
+      )}
 
       {/* Tabs Section */}
       <Box
@@ -468,7 +556,21 @@ const onSubmit = async (data: any) => {
         </Tabs>
 
         <Box sx={{ p: 3 }}>
-          {tabValue === 0 && <OfficialForm control={control} />}
+          {tabValue === 0 && (
+            <OfficialForm
+              control={control}
+              genderOptions={setupOptions.gender}
+              visaTypeOptions={setupOptions.visaType}
+              sectionOptions={setupOptions.section}
+              visaSponsorOptions={setupOptions.visaSponsor}
+              employmentTypeOptions={setupOptions.employmentType}
+              lineManagerOptions={setupOptions.lineManager}
+              labourCardStatusOptions={setupOptions.labourCardStatus}
+              positionOptions={setupOptions.position}
+              addResponsibilityOptions={setupOptions.addResponsibility}
+              religionOptions={setupOptions.religion}
+            />
+          )}
           {tabValue === 1 && <PersonalForm control={control} />}
           {tabValue === 2 && <DocumentsForm control={control} />}
           {tabValue === 3 && <GeneralForm control={control} />}

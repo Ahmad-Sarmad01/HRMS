@@ -2,13 +2,44 @@ import { FC } from "react";
 import { Control, FieldValues } from "react-hook-form";
 import FormGrid from "../formFields/FormGrid";
 
+interface SetupOption {
+  id: string | number;
+  name: string;
+  [key: string]: any;
+}
+
 interface OfficialFormProps<T extends FieldValues> {
   control: Control<T>;
+  genderOptions?: SetupOption[];
+  visaTypeOptions?: SetupOption[];
+  sectionOptions?: SetupOption[];
+  visaSponsorOptions?: SetupOption[];
+  employmentTypeOptions?: SetupOption[];
+  lineManagerOptions?: SetupOption[];
+  labourCardStatusOptions?: SetupOption[];
+  positionOptions?: SetupOption[];
+  addResponsibilityOptions?: SetupOption[];
+  religionOptions?: SetupOption[];
 }
 
 const OfficialForm = <T extends FieldValues>({
   control,
+  genderOptions = [],
+  visaTypeOptions = [],
+  sectionOptions = [],
+  visaSponsorOptions = [],
+  employmentTypeOptions = [],
+  lineManagerOptions = [],
+  labourCardStatusOptions = [],
+  positionOptions = [],
+  addResponsibilityOptions = [],
+  religionOptions = [],
 }: OfficialFormProps<T>) => {
+  // Convert API options to dropdown format
+  const formatOptions = (options: SetupOption[]): string[] => {
+    return options.map((option) => option.name || String(option.id));
+  };
+
   const fields = [
     { name: "dateOfBirth", label: "Date of Birth", type: "date" },
     { name: "age", label: "Age", type: "text" },
@@ -16,45 +47,45 @@ const OfficialForm = <T extends FieldValues>({
       name: "gender",
       label: "Gender",
       type: "select",
-      options: ["Male", "Female", "Other"],
+      options: formatOptions(genderOptions),
     },
 
     {
       name: "visaType",
       label: "Visa Type",
       type: "select",
-      options: ["Work", "Resident", "Visit"],
+      options: formatOptions(visaTypeOptions),
     },
     {
       name: "section",
       label: "Section",
       type: "select",
-      options: ["Administration", "Finance", "Operations"],
+      options: formatOptions(sectionOptions),
     },
     {
       name: "visaSponsor",
       label: "Visa Sponsor",
       type: "select",
-      options: ["Company", "Self", "Family"],
+      options: formatOptions(visaSponsorOptions),
     },
 
     {
       name: "employmentType",
       label: "Employment Type",
       type: "select",
-      options: ["Permanent", "Contract", "Temporary"],
+      options: formatOptions(employmentTypeOptions),
     },
     {
       name: "lineManager1",
       label: "Line Manager 1",
       type: "select",
-      options: ["Manager A", "Manager B", "Manager C"],
+      options: formatOptions(lineManagerOptions),
     },
     {
       name: "lineManager2",
       label: "Line Manager 2",
       type: "select",
-      options: ["Manager D", "Manager E", "Manager F"],
+      options: formatOptions(lineManagerOptions),
     },
 
     { name: "probationDays", label: "Probation Days", type: "text" },
@@ -92,28 +123,28 @@ const OfficialForm = <T extends FieldValues>({
       name: "labourCardStatus",
       label: "Labour Card Status",
       type: "select",
-      options: ["Active", "Expired", "Pending"],
+      options: formatOptions(labourCardStatusOptions),
     },
     { name: "speciality", label: "Speciality", type: "text" },
     {
       name: "position",
       label: "Position",
       type: "select",
-      options: ["Staff", "Supervisor", "Manager"],
+      options: formatOptions(positionOptions),
     },
 
     {
       name: "additionalResponsibility",
       label: "Additional Responsibility",
       type: "select",
-      options: ["Coordinator", "Mentor", "Safety Officer"],
+      options: formatOptions(addResponsibilityOptions),
     },
     { name: "rfid", label: "RFID", type: "text" },
     {
       name: "religion",
       label: "Religion",
       type: "select",
-      options: ["Islam", "Christianity", "Hinduism", "Other"],
+      options: formatOptions(religionOptions),
     },
 
     { name: "emiratesIdNo", label: "Emirates ID No", type: "text" },

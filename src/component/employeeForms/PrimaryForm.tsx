@@ -3,13 +3,34 @@ import { Box, Grid } from "@mui/material";
 import FormFieldSelector from "../formFields/FormFieldSelector";
 import ImageInput from "../formFields/ImageInput";
 
+interface SetupOption {
+  id: string | number;
+  name: string;
+  [key: string]: any;
+}
+
 interface PrimaryFormProps<T extends FieldValues> {
   control: Control<T>;
+  statusOptions?: SetupOption[];
+  branchOptions?: SetupOption[];
+  designationOptions?: SetupOption[];
+  subStatusOptions?: SetupOption[];
+  nationalityOptions?: SetupOption[];
 }
 
 const PrimaryForm = <T extends FieldValues>({
   control,
+  statusOptions = [],
+  branchOptions = [],
+  designationOptions = [],
+  subStatusOptions = [],
+  nationalityOptions = [],
 }: PrimaryFormProps<T>) => {
+  // Convert API options to dropdown format
+  const formatOptions = (options: SetupOption[]): string[] => {
+    return options.map((option) => option.name || String(option.id));
+  };
+
   const fields = [
     {
       name: "staffCode",
@@ -30,7 +51,7 @@ const PrimaryForm = <T extends FieldValues>({
       label: "Status",
       type: "select",
       fieldSize: "normal",
-      options: ["Active", "Inactive"],
+      options: formatOptions(statusOptions),
       required: true,
     },
     {
@@ -38,7 +59,7 @@ const PrimaryForm = <T extends FieldValues>({
       label: "Branch",
       type: "select",
       fieldSize: "normal",
-      options: ["Head Office", "Branch A", "Branch B"],
+      options: formatOptions(branchOptions),
       required: true,
     },
     {
@@ -53,7 +74,7 @@ const PrimaryForm = <T extends FieldValues>({
       label: "Designation",
       type: "select",
       fieldSize: "normal",
-      options: ["Manager", "Senior Staff", "Junior Staff"],
+      options: formatOptions(designationOptions),
       required: true,
     },
     {
@@ -61,7 +82,7 @@ const PrimaryForm = <T extends FieldValues>({
       label: "Sub Status",
       type: "select",
       fieldSize: "normal",
-      options: ["Probation", "Confirmed", "Contract"],
+      options: formatOptions(subStatusOptions),
       required: false,
     },
     {
@@ -85,7 +106,7 @@ const PrimaryForm = <T extends FieldValues>({
       label: "Nationality",
       type: "select",
       fieldSize: "normal",
-      options: ["UAE", "India", "Pakistan", "Philippines", "Other"],
+      options: formatOptions(nationalityOptions),
       required: true,
     },
     {

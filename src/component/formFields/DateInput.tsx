@@ -36,6 +36,7 @@ const DateInput = <T extends FieldValues>({
         render={({ field, fieldState: { error } }) => (
           <TextField
             {...field}
+            value={field.value || ""}
             type="date"
             fullWidth
             error={!!error}
@@ -44,7 +45,7 @@ const DateInput = <T extends FieldValues>({
               shrink: true,
             }}
             inputProps={{
-              placeholder: "yyyy-MM-dd",
+              pattern: "\\d{4}-\\d{2}-\\d{2}",
             }}
             sx={{
               mt: 0.5,
