@@ -132,11 +132,11 @@ const EmployeeRegistration: FC = () => {
           religion: options.religion || [],
         });
       } catch (error) {
-        console.error('Error loading setup options:', error);
+        console.error("Error loading setup options:", error);
         setSnackbar({
           open: true,
-          message: 'Failed to load dropdown options',
-          severity: 'error',
+          message: "Failed to load dropdown options",
+          severity: "error",
         });
       } finally {
         setIsLoadingOptions(false);
@@ -163,97 +163,96 @@ const EmployeeRegistration: FC = () => {
     handleMenuClose();
   };
 
-const onSubmit = async (data: any) => {
-  try {
-    setIsSubmitting(true);
+  const onSubmit = async (data: any) => {
+    try {
+      setIsSubmitting(true);
 
-    // Group the form data according to your internal form sections
-    const fullFormData = {
-      // Primary Info
-      employeeName: data.employeeName ?? "",
-      staffCode: data.staffCode ?? "",
-      branch: data.branch ?? "",
-      department: data.department ?? "",
-      personalEmail: data.personalEmail ?? "",
-      nationalityCountry: data.nationalityCountry ?? "",
-      religion: data.religion ?? "",
-      maritalStatus: data.maritalStatus ?? "",
+      // Group the form data according to your internal form sections
+      const fullFormData = {
+        // Primary Info
+        employeeName: data.employeeName ?? "",
+        staffCode: data.staffCode ?? "",
+        branch: data.branch ?? "",
+        department: data.department ?? "",
+        personalEmail: data.personalEmail ?? "",
+        nationalityCountry: data.nationalityCountry ?? "",
+        religion: data.religion ?? "",
+        maritalStatus: data.maritalStatus ?? "",
 
-      // Official Info
-      designation: data.designation ?? "",
-      joiningDate: data.joiningDate ?? "",
-      employeeCategory: data.employeeCategory ?? "",
-      officialEmail: data.officialEmail ?? "",
-      status: data.status ?? "",
-      employmentType: data.employmentType ?? "",
-      probationDays: data.probationDays ?? "",
-      resignationDate: data.resignationDate ?? "",
-      adekStatus: data.adekStatus ?? "",
-      contractExpiryDate: data.contractExpiryDate ?? "",
-      labourCardStatus: data.labourCardStatus ?? "",
-      addResponsibility: data.addResponsibility ?? "",
-      lineManager1: data.lineManager1 ?? "",
-      lineManager2: data.lineManager2 ?? "",
-      probationEndDate: data.probationEndDate ?? "",
-      noticePeriod: data.noticePeriod ?? "",
-      adekDesignation: data.adekDesignation ?? "",
-      currentGrade: data.currentGrade ?? "",
-      position: data.position ?? "",
-      specialty: data.specialty ?? "",
-      rfid: data.rfid ?? "",
+        // Official Info
+        designation: data.designation ?? "",
+        joiningDate: data.joiningDate ?? "",
+        employeeCategory: data.employeeCategory ?? "",
+        officialEmail: data.officialEmail ?? "",
+        status: data.status ?? "",
+        employmentType: data.employmentType ?? "",
+        probationDays: data.probationDays ?? "",
+        resignationDate: data.resignationDate ?? "",
+        adekStatus: data.adekStatus ?? "",
+        contractExpiryDate: data.contractExpiryDate ?? "",
+        labourCardStatus: data.labourCardStatus ?? "",
+        addResponsibility: data.addResponsibility ?? "",
+        lineManager1: data.lineManager1 ?? "",
+        lineManager2: data.lineManager2 ?? "",
+        probationEndDate: data.probationEndDate ?? "",
+        noticePeriod: data.noticePeriod ?? "",
+        adekDesignation: data.adekDesignation ?? "",
+        currentGrade: data.currentGrade ?? "",
+        position: data.position ?? "",
+        specialty: data.specialty ?? "",
+        rfid: data.rfid ?? "",
 
-      // Personal Info
-      arabicName: data.arabicName ?? "",
-      uploadPhotoName: data.uploadPhotoName ?? "",
-      idCard: data.idCard ?? "",
-      dateOfBirth: data.dateOfBirth ?? "",
-      emiratesIdNo: data.emiratesIdNo ?? "",
-      emiratesIdExpiryDate: data.emiratesIdExpiryDate ?? "",
-      actualJoiningDate: data.actualJoiningDate ?? "",
-      gender: data.gender ?? "",
-      visaSponsor: data.visaSponsor ?? "",
-      visaDesignation: data.visaDesignation ?? "",
-      lastWorkingDate: data.lastWorkingDate ?? "",
-      modifiedBy: data.modifiedBy ?? "",
-      modifiedDate: data.modifiedDate ?? "",
-      tlsStatus: data.tlsStatus ?? "",
-      tlsExpiryDate: data.tlsExpiryDate ?? "",
-      remarks: data.remarks ?? "",
-      signature: data.signature ?? "",
-      moeRegistrationNo: data.moeRegistrationNo ?? "",
-      companyID: data.companyID ?? "",
-    };
+        // Personal Info
+        arabicName: data.arabicName ?? "",
+        uploadPhotoName: data.uploadPhotoName ?? "",
+        idCard: data.idCard ?? "",
+        dateOfBirth: data.dateOfBirth ?? "",
+        emiratesIdNo: data.emiratesIdNo ?? "",
+        emiratesIdExpiryDate: data.emiratesIdExpiryDate ?? "",
+        actualJoiningDate: data.actualJoiningDate ?? "",
+        gender: data.gender ?? "",
+        visaSponsor: data.visaSponsor ?? "",
+        visaDesignation: data.visaDesignation ?? "",
+        lastWorkingDate: data.lastWorkingDate ?? "",
+        modifiedBy: data.modifiedBy ?? "",
+        modifiedDate: data.modifiedDate ?? "",
+        tlsStatus: data.tlsStatus ?? "",
+        tlsExpiryDate: data.tlsExpiryDate ?? "",
+        remarks: data.remarks ?? "",
+        signature: data.signature ?? "",
+        moeRegistrationNo: data.moeRegistrationNo ?? "",
+        companyID: data.companyID ?? "",
+      };
 
-    // Convert to API format (maps keys to backend keys)
-    const apiBody = convertToAPIFormat(fullFormData);
+      // Convert to API format (maps keys to backend keys)
+      const apiBody = convertToAPIFormat(fullFormData);
 
-    console.log("Submitting data:", apiBody);
+      console.log("Submitting data:", apiBody);
 
-    const response = await employeeService.createEmployee(apiBody as any);
+      const response = await employeeService.createEmployee(apiBody as any);
 
-    setSnackbar({
-      open: true,
-      message: "Employee registered successfully!",
-      severity: "success",
-    });
+      setSnackbar({
+        open: true,
+        message: "Employee registered successfully!",
+        severity: "success",
+      });
 
-    reset();
-    setTabValue(0);
+      reset();
+      setTabValue(0);
 
-    console.log("Response:", response);
-  } catch (error: any) {
-    console.error("Error submitting form:", error);
-    setSnackbar({
-      open: true,
-      message:
-        error.message || "Failed to register employee. Please try again.",
-      severity: "error",
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+      console.log("Response:", response);
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      setSnackbar({
+        open: true,
+        message:
+          error.message || "Failed to register employee. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
@@ -350,14 +349,16 @@ const onSubmit = async (data: any) => {
               onMouseEnter={isLastButton ? handleMenuOpen : undefined}
               onMouseLeave={isLastButton ? handleMenuClose : undefined}
             >
-            <PillButton
-              index={i}
-              onClick={(index) => handlePillButtonClick(index, e.title)}
-            >
-              {isSubmitting && <CircularProgress size={16} sx={{ mr: 0.5 }} />}
-              <Icon />
-              {e.title}
-            </PillButton>
+              <PillButton
+                index={i}
+                onClick={(index) => handlePillButtonClick(index, e.title)}
+              >
+                {isSubmitting && (
+                  <CircularProgress size={16} sx={{ mr: 0.5 }} />
+                )}
+                <Icon />
+                {e.title}
+              </PillButton>
             </Box>
           );
         })}
@@ -490,7 +491,7 @@ const onSubmit = async (data: any) => {
       </Menu>
 
       {isLoadingOptions ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
         </Box>
       ) : (
