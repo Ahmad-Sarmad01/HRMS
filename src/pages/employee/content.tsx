@@ -6,7 +6,7 @@ import {
   ArrowLeft,
   Search,
   Menu,
-  List
+  List,
 } from "lucide-react";
 
 const TopPillButtonData = [
@@ -29,10 +29,6 @@ const TopPillButtonData = [
   {
     icon: Search,
     title: "Search",
-  },
-  {
-    icon: List,
-    title: "List",
   },
   {
     icon: Menu,

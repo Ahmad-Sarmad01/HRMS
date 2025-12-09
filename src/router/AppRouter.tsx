@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "../appLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
 import EmployeeRegistration from "../pages/employee/Registration";
+import EmployeeList from "../pages/employee/EmployeeList";
 import StaffAppointment from "../pages/employee/StaffAppointment";
 import DocumentRegister from "../pages/documents/DocumentRegister";
 import NewDocument from "../pages/documents/NewDocument";
@@ -43,6 +44,7 @@ const AppRouter = () => {
 
           {/* Employee Routes */}
           <Route path="/employees/new" element={<EmployeeRegistration />} />
+          <Route path="/employees/list" element={<EmployeeList />} />
           <Route path="/employees/appointment" element={<StaffAppointment />} />
 
           {/* Document Routes */}

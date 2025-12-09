@@ -44,12 +44,10 @@ import {
 import {
   getDefaultFormValues,
   convertToAPIFormat,
+  fieldNameMapping,
 } from "../../utils/fieldMapping";
 import { employeeService } from "../../services/employeeService";
 import { setupService, SetupOption } from "../../services/setupService";
-import { Employee } from "../../types/employee";
-import EmployeeTable from "../../component/employee/EmployeeTable";
-import EmployeeDetailModal from "../../component/employee/EmployeeDetailModal";
 
 const EmployeeRegistration: FC = () => {
   const navigate = useNavigate();
@@ -98,13 +96,6 @@ const EmployeeRegistration: FC = () => {
     religion: [],
   });
   const [isLoadingOptions, setIsLoadingOptions] = useState(true);
-  const [view, setView] = useState<"form" | "table">("form");
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const menuOpen = Boolean(menuAnchorEl);
 
@@ -156,42 +147,6 @@ const EmployeeRegistration: FC = () => {
     fetchSetupOptions();
   }, []);
 
-  const fetchEmployees = async () => {
-    try {
-      setIsLoadingEmployees(true);
-      const data = await employeeService.getEmployees();
-      setEmployees(data);
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-      setSnackbar({
-        open: true,
-        message: "Failed to fetch employees",
-        severity: "error",
-      });
-    } finally {
-      setIsLoadingEmployees(false);
-    }
-  };
-
-  const handleViewToggle = () => {
-    if (view === "form") {
-      fetchEmployees();
-      setView("table");
-    } else {
-      setView("form");
-    }
-  };
-
-  const handleViewEmployee = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedEmployee(null);
-  };
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
@@ -213,62 +168,13 @@ const EmployeeRegistration: FC = () => {
     try {
       setIsSubmitting(true);
 
-      // Group the form data according to your internal form sections
-      const fullFormData = {
-        // Primary Info
-        employeeName: data.employeeName ?? "",
-        staffCode: data.staffCode ?? "",
-        branch: data.branch ?? "",
-        department: data.department ?? "",
-        personalEmail: data.personalEmail ?? "",
-        nationalityCountry: data.nationalityCountry ?? "",
-        religion: data.religion ?? "",
-        maritalStatus: data.maritalStatus ?? "",
-
-        // Official Info
-        designation: data.designation ?? "",
-        joiningDate: data.joiningDate ?? "",
-        employeeCategory: data.employeeCategory ?? "",
-        officialEmail: data.officialEmail ?? "",
-        status: data.status ?? "",
-        employmentType: data.employmentType ?? "",
-        probationDays: data.probationDays ?? "",
-        resignationDate: data.resignationDate ?? "",
-        adekStatus: data.adekStatus ?? "",
-        contractExpiryDate: data.contractExpiryDate ?? "",
-        labourCardStatus: data.labourCardStatus ?? "",
-        addResponsibility: data.addResponsibility ?? "",
-        lineManager1: data.lineManager1 ?? "",
-        lineManager2: data.lineManager2 ?? "",
-        probationEndDate: data.probationEndDate ?? "",
-        noticePeriod: data.noticePeriod ?? "",
-        adekDesignation: data.adekDesignation ?? "",
-        currentGrade: data.currentGrade ?? "",
-        position: data.position ?? "",
-        specialty: data.specialty ?? "",
-        rfid: data.rfid ?? "",
-
-        // Personal Info
-        arabicName: data.arabicName ?? "",
-        uploadPhotoName: data.uploadPhotoName ?? "",
-        idCard: data.idCard ?? "",
-        dateOfBirth: data.dateOfBirth ?? "",
-        emiratesIdNo: data.emiratesIdNo ?? "",
-        emiratesIdExpiryDate: data.emiratesIdExpiryDate ?? "",
-        actualJoiningDate: data.actualJoiningDate ?? "",
-        gender: data.gender ?? "",
-        visaSponsor: data.visaSponsor ?? "",
-        visaDesignation: data.visaDesignation ?? "",
-        lastWorkingDate: data.lastWorkingDate ?? "",
-        modifiedBy: data.modifiedBy ?? "",
-        modifiedDate: data.modifiedDate ?? "",
-        tlsStatus: data.tlsStatus ?? "",
-        tlsExpiryDate: data.tlsExpiryDate ?? "",
-        remarks: data.remarks ?? "",
-        signature: data.signature ?? "",
-        moeRegistrationNo: data.moeRegistrationNo ?? "",
-        companyID: data.companyID ?? "",
-      };
+      // Build the form payload using the frontend->API field mapping
+      const fullFormData = getDefaultFormValues();
+      Object.keys(fullFormData).forEach((frontendKey) => {
+        if ((data as any)[frontendKey] !== undefined) {
+          fullFormData[frontendKey] = (data as any)[frontendKey];
+        }
+      });
 
       // Convert to API format (maps keys to backend keys)
       const apiBody = convertToAPIFormat(fullFormData);
@@ -317,8 +223,6 @@ const EmployeeRegistration: FC = () => {
     } else if (title === "Back") {
       // Navigate to dashboard
       navigate("/dashboard");
-    } else if (title === "List") {
-      handleViewToggle();
     }
     // Handle other buttons (Edit, Search) as needed
   };
@@ -538,134 +442,98 @@ const EmployeeRegistration: FC = () => {
         </MenuItem>
       </Menu>
 
-      {view === "form" ? (
-        <>
-          {isLoadingOptions ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <PrimaryForm
-              control={control}
-              statusOptions={setupOptions.status}
-              branchOptions={setupOptions.branch}
-              designationOptions={setupOptions.designation}
-              subStatusOptions={setupOptions.subStatus}
-              nationalityOptions={setupOptions.nationality}
-            />
-          )}
-
-          {/* Tabs Section */}
-          <Box
-            sx={{
-              mt: 3,
-              border: "1px solid #E5E7EB",
-              borderRadius: 2,
-              backgroundColor: "#FFFFFF",
-            }}
-          >
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                borderBottom: "1px solid #E5E7EB",
-                "& .MuiTab-root": {
-                  textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: "0.95rem",
-                  color: "#86764e",
-                  minHeight: 48,
-                  "&.Mui-selected": {
-                    color: "#011527",
-                  },
-                },
-                "& .MuiTabs-indicator": {
-                  backgroundColor: "#D9C48C",
-                  height: 3,
-                },
-              }}
-            >
-              <Tab icon={<BadgeIcon />} iconPosition="start" label="Official" />
-              <Tab
-                icon={<PersonIcon />}
-                iconPosition="start"
-                label="Personal"
-              />
-              <Tab
-                icon={<DescriptionIcon />}
-                iconPosition="start"
-                label="Documents"
-              />
-              <Tab icon={<InfoIcon />} iconPosition="start" label="General" />
-              <Tab
-                icon={<PeopleIcon />}
-                iconPosition="start"
-                label="Dependant"
-              />
-              <Tab
-                icon={<BeachAccessIcon />}
-                iconPosition="start"
-                label="Leave"
-              />
-              <Tab
-                icon={<AccountBalanceWalletIcon />}
-                iconPosition="start"
-                label="Finance"
-              />
-              <Tab icon={<PaidIcon />} iconPosition="start" label="Payroll" />
-              <Tab
-                icon={<MoreHorizIcon />}
-                iconPosition="start"
-                label="Others"
-              />
-            </Tabs>
-
-            <Box sx={{ p: 3 }}>
-              {tabValue === 0 && (
-                <OfficialForm
-                  control={control}
-                  genderOptions={setupOptions.gender}
-                  visaTypeOptions={setupOptions.visaType}
-                  sectionOptions={setupOptions.section}
-                  visaSponsorOptions={setupOptions.visaSponsor}
-                  employmentTypeOptions={setupOptions.employmentType}
-                  lineManagerOptions={setupOptions.lineManager}
-                  labourCardStatusOptions={setupOptions.labourCardStatus}
-                  positionOptions={setupOptions.position}
-                  addResponsibilityOptions={setupOptions.addResponsibility}
-                  religionOptions={setupOptions.religion}
-                />
-              )}
-              {tabValue === 1 && <PersonalForm control={control} />}
-              {tabValue === 2 && <DocumentsForm control={control} />}
-              {tabValue === 3 && <GeneralForm control={control} />}
-              {tabValue === 4 && <DependantForm control={control} />}
-              {tabValue === 5 && <LeaveForm control={control} />}
-              {tabValue === 6 && <FinanceForm control={control} />}
-              {tabValue === 7 && <PayrollForm control={control} />}
-              {tabValue === 8 && <OthersForm control={control} />}
-            </Box>
-          </Box>
-        </>
+      {isLoadingOptions ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress />
+        </Box>
       ) : (
-        <>
-          {isLoadingEmployees ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <EmployeeTable employees={employees} onView={handleViewEmployee} />
-          )}
-        </>
+        <PrimaryForm
+          control={control}
+          statusOptions={setupOptions.status}
+          branchOptions={setupOptions.branch}
+          designationOptions={setupOptions.designation}
+          subStatusOptions={setupOptions.subStatus}
+          nationalityOptions={setupOptions.nationality}
+        />
       )}
 
-      <EmployeeDetailModal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        employee={selectedEmployee}
-      />
+      {/* Tabs Section */}
+      <Box
+        sx={{
+          mt: 3,
+          border: "1px solid #E5E7EB",
+          borderRadius: 2,
+          backgroundColor: "#FFFFFF",
+        }}
+      >
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            borderBottom: "1px solid #E5E7EB",
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              color: "#86764e",
+              minHeight: 48,
+              "&.Mui-selected": {
+                color: "#011527",
+              },
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#D9C48C",
+              height: 3,
+            },
+          }}
+        >
+          <Tab icon={<BadgeIcon />} iconPosition="start" label="Official" />
+          <Tab icon={<PersonIcon />} iconPosition="start" label="Personal" />
+          <Tab
+            icon={<DescriptionIcon />}
+            iconPosition="start"
+            label="Documents"
+          />
+          <Tab icon={<InfoIcon />} iconPosition="start" label="General" />
+          <Tab icon={<PeopleIcon />} iconPosition="start" label="Dependant" />
+          <Tab icon={<BeachAccessIcon />} iconPosition="start" label="Leave" />
+          <Tab
+            icon={<AccountBalanceWalletIcon />}
+            iconPosition="start"
+            label="Finance"
+          />
+          <Tab icon={<PaidIcon />} iconPosition="start" label="Payroll" />
+          <Tab icon={<MoreHorizIcon />} iconPosition="start" label="Others" />
+        </Tabs>
+
+        <Box sx={{ p: 3 }}>
+          {tabValue === 0 && (
+            <OfficialForm
+              control={control}
+              genderOptions={setupOptions.gender}
+              visaTypeOptions={setupOptions.visaType}
+              sectionOptions={setupOptions.section}
+              visaSponsorOptions={setupOptions.visaSponsor}
+              employmentTypeOptions={setupOptions.employmentType}
+              lineManagerOptions={setupOptions.lineManager}
+              labourCardStatusOptions={setupOptions.labourCardStatus}
+              positionOptions={setupOptions.position}
+              addResponsibilityOptions={setupOptions.addResponsibility}
+              religionOptions={setupOptions.religion}
+            />
+          )}
+          {tabValue === 1 && <PersonalForm control={control} />}
+          {tabValue === 2 && <DocumentsForm control={control} />}
+          {tabValue === 3 && <GeneralForm control={control} />}
+          {tabValue === 4 && <DependantForm control={control} />}
+          {tabValue === 5 && <LeaveForm control={control} />}
+          {tabValue === 6 && <FinanceForm control={control} />}
+          {tabValue === 7 && <PayrollForm control={control} />}
+          {tabValue === 8 && <OthersForm control={control} />}
+        </Box>
+      </Box>
 
       {/* Snackbar for notifications */}
       <Snackbar
