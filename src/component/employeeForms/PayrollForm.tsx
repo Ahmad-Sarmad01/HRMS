@@ -36,10 +36,12 @@ interface AllowanceItem {
 
 interface PayrollFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const PayrollForm = <T extends FieldValues>({
   control,
+  disabled = false,
 }: PayrollFormProps<T>) => {
   // Salary fields
   const salaryFields = [
@@ -351,6 +353,7 @@ const PayrollForm = <T extends FieldValues>({
           fields={contractDetailsFields}
           control={control}
           label="Contract Details"
+          disabled={disabled}
         />
       </Box>
 
@@ -360,6 +363,7 @@ const PayrollForm = <T extends FieldValues>({
           fields={bankDetailsFields}
           control={control}
           label="Bank Details"
+          disabled={disabled}
         />
       </Box>
     </Box>

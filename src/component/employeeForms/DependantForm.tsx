@@ -40,10 +40,12 @@ interface DependantItem {
 
 interface DependantFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const DependantForm = <T extends FieldValues>({
   control,
+  disabled = false,
 }: DependantFormProps<T>) => {
   // Dependant State
   const [dependantRows, setDependantRows] = useState<DependantItem[]>([]);

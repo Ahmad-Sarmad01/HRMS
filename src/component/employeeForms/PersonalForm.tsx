@@ -5,10 +5,12 @@ import { Box, Grid } from "@mui/material";
 
 interface PersonalFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const PersonalForm = <T extends FieldValues>({
   control,
+  disabled = false,
 }: PersonalFormProps<T>) => {
   const addressFields = [
     {
@@ -141,7 +143,12 @@ const PersonalForm = <T extends FieldValues>({
 
   return (
     <Box>
-      <FormGrid fields={addressFields} control={control} label="Address" />
+      <FormGrid
+        fields={addressFields}
+        control={control}
+        label="Address"
+        disabled={disabled}
+      />
       <Box sx={{ mb: 4 }} />
 
       <Grid container spacing={2}>
@@ -151,6 +158,7 @@ const PersonalForm = <T extends FieldValues>({
             control={control}
             label="Home Country Address"
             columns={2}
+            disabled={disabled}
           />
         </Grid>
         <Grid size={{ md: 4, xs: 12 }}>
@@ -159,6 +167,7 @@ const PersonalForm = <T extends FieldValues>({
             control={control}
             label="Emergency Contact"
             columns={2}
+            disabled={disabled}
           />
         </Grid>
       </Grid>
@@ -170,6 +179,7 @@ const PersonalForm = <T extends FieldValues>({
             control={control}
             label="Additional Information"
             columns={2}
+            disabled={disabled}
           />
         </Grid>
         <Grid size={{ md: 8, xs: 12 }}>
@@ -177,6 +187,7 @@ const PersonalForm = <T extends FieldValues>({
             fields={provisioningFields}
             control={control}
             label="Provisioning"
+            disabled={disabled}
           />
         </Grid>
       </Grid>

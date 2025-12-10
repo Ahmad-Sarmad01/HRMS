@@ -19,6 +19,7 @@ interface FormGridProps<T extends FieldValues> {
   control?: Control<T>;
   label?: string;
   columns?: 2 | 3 | 4;
+  disabled?: boolean;
 }
 
 const FormGrid = <T extends FieldValues>({
@@ -26,6 +27,7 @@ const FormGrid = <T extends FieldValues>({
   control,
   label,
   columns = 3,
+  disabled = false,
 }: FormGridProps<T>) => {
   const containerSx = label
     ? {
@@ -73,7 +75,11 @@ const FormGrid = <T extends FieldValues>({
               return (
                 <Grid size={{ md: mdSize, sm: 6, xs: 12 }} key={field.name}>
                   {control ? (
-                    <FormFieldSelector field={field} control={control} />
+                    <FormFieldSelector
+                      field={field}
+                      control={control}
+                      disabled={disabled}
+                    />
                   ) : (
                     <div>{field.label} (No control provided)</div>
                   )}

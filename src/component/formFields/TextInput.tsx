@@ -11,6 +11,7 @@ interface TextInputProps<T extends FieldValues> {
   required?: boolean;
   inputMode?: "text" | "numeric" | "email";
   maxLength?: number;
+  disabled?: boolean;
 }
 
 const TextInput = <T extends FieldValues>({
@@ -22,6 +23,7 @@ const TextInput = <T extends FieldValues>({
   required = false,
   inputMode,
   maxLength,
+  disabled = false,
 }: TextInputProps<T>) => {
   return (
     <Box display="flex" flexDirection="column">
@@ -47,6 +49,7 @@ const TextInput = <T extends FieldValues>({
             type={type}
             placeholder={placeholder}
             fullWidth
+            disabled={disabled}
             error={!!error}
             helperText={error?.message}
             inputProps={{

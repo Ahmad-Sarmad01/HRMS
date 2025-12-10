@@ -22,11 +22,13 @@ interface FormField {
 interface FormFieldSelectorProps<T extends FieldValues> {
   field: FormField;
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const FormFieldSelector = <T extends FieldValues>({
   field,
   control,
+  disabled = false,
 }: FormFieldSelectorProps<T>) => {
   const fieldName = field.name as Path<T>;
 
@@ -38,6 +40,7 @@ const FormFieldSelector = <T extends FieldValues>({
         label={field.label}
         options={field.options || []}
         required={field.required}
+        disabled={disabled}
       />
     );
   }
@@ -49,6 +52,7 @@ const FormFieldSelector = <T extends FieldValues>({
         control={control}
         label={field.label}
         required={field.required}
+        disabled={disabled}
       />
     );
   }
@@ -61,6 +65,7 @@ const FormFieldSelector = <T extends FieldValues>({
         label={field.label}
         accept={field.accept}
         required={field.required}
+        disabled={disabled}
       />
     );
   }
@@ -72,6 +77,7 @@ const FormFieldSelector = <T extends FieldValues>({
         control={control}
         label={field.label}
         required={field.required}
+        disabled={disabled}
       />
     );
   }
@@ -87,6 +93,7 @@ const FormFieldSelector = <T extends FieldValues>({
       required={field.required}
       inputMode={field.inputMode}
       maxLength={field.maxLength}
+      disabled={disabled}
     />
   );
 };

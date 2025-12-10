@@ -15,6 +15,7 @@ interface SelectInputProps<T extends FieldValues> {
   label: string;
   options: string[];
   required?: boolean;
+  disabled?: boolean;
 }
 
 const SelectInput = <T extends FieldValues>({
@@ -23,6 +24,7 @@ const SelectInput = <T extends FieldValues>({
   label,
   options = [],
   required = false,
+  disabled = false,
 }: SelectInputProps<T>) => {
   return (
     <Box display="flex" flexDirection="column">
@@ -47,6 +49,7 @@ const SelectInput = <T extends FieldValues>({
             <Select
               {...field}
               value={field.value || ""}
+              disabled={disabled}
               displayEmpty
               sx={{
                 borderRadius: 2,

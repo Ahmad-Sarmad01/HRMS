@@ -46,10 +46,12 @@ interface ExperienceItem {
 
 interface GeneralFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const GeneralForm = <T extends FieldValues>({
   control,
+  disabled = false,
 }: GeneralFormProps<T>) => {
   const [qualificationSummary, setQualificationSummary] = useState("");
   const [internalExperience, setInternalExperience] = useState("");

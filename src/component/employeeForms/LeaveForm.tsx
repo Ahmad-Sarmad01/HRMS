@@ -36,9 +36,13 @@ interface LeaveItem {
 
 interface LeaveFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
-const LeaveForm = <T extends FieldValues>({ control }: LeaveFormProps<T>) => {
+const LeaveForm = <T extends FieldValues>({
+  control,
+  disabled = false,
+}: LeaveFormProps<T>) => {
   // Leave State
   const [leaveRows, setLeaveRows] = useState<LeaveItem[]>([]);
   const [leaveOpen, setLeaveOpen] = useState(false);
@@ -276,6 +280,7 @@ const LeaveForm = <T extends FieldValues>({ control }: LeaveFormProps<T>) => {
         <FormGrid
           control={control}
           label="Leave"
+          disabled={disabled}
           fields={[
             {
               name: "openingLeave",

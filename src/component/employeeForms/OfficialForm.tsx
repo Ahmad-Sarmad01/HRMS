@@ -20,6 +20,7 @@ interface OfficialFormProps<T extends FieldValues> {
   positionOptions?: SetupOption[];
   addResponsibilityOptions?: SetupOption[];
   religionOptions?: SetupOption[];
+  disabled?: boolean;
 }
 
 const OfficialForm = <T extends FieldValues>({
@@ -34,6 +35,7 @@ const OfficialForm = <T extends FieldValues>({
   positionOptions = [],
   addResponsibilityOptions = [],
   religionOptions = [],
+  disabled = false,
 }: OfficialFormProps<T>) => {
   // Convert API options to dropdown format
   const formatOptions = (options: SetupOption[]): string[] => {
@@ -176,7 +178,7 @@ const OfficialForm = <T extends FieldValues>({
     { name: "signature", label: "Signature", type: "file" },
   ];
 
-  return <FormGrid fields={fields} control={control} />;
+  return <FormGrid fields={fields} control={control} disabled={disabled} />;
 };
 
 export default OfficialForm;

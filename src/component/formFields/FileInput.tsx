@@ -9,6 +9,7 @@ interface FileInputProps<T extends FieldValues> {
   label: string;
   accept?: string[];
   required?: boolean;
+  disabled?: boolean;
 }
 
 const FileInput = <T extends FieldValues>({
@@ -17,6 +18,7 @@ const FileInput = <T extends FieldValues>({
   label,
   accept = [],
   required = false,
+  disabled = false,
 }: FileInputProps<T>) => {
   const [fileName, setFileName] = useState<string>("");
 
@@ -47,6 +49,7 @@ const FileInput = <T extends FieldValues>({
               component="label"
               variant="outlined"
               fullWidth
+              disabled={disabled}
               startIcon={<UploadFileIcon />}
               sx={{
                 mt: 0.5,
@@ -69,6 +72,7 @@ const FileInput = <T extends FieldValues>({
                 {...field}
                 type="file"
                 hidden
+                disabled={disabled}
                 accept={accept.join(",")}
                 onChange={(e) => {
                   const file = e.target.files?.[0];

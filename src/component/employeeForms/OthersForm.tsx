@@ -5,9 +5,13 @@ import FormGrid from "../formFields/FormGrid";
 
 interface OthersFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
-const OthersForm = <T extends FieldValues>({ control }: OthersFormProps<T>) => {
+const OthersForm = <T extends FieldValues>({
+  control,
+  disabled = false,
+}: OthersFormProps<T>) => {
   const extraDetailsFields = [
     {
       name: "staffNameAsPerPassport",
@@ -317,9 +321,15 @@ const OthersForm = <T extends FieldValues>({ control }: OthersFormProps<T>) => {
         fields={extraDetailsFields}
         control={control}
         label="Extra Details"
+        disabled={disabled}
       />
       <Box sx={{ mt: 3 }}>
-        <FormGrid fields={benefitsFields} control={control} label="Benefits" />
+        <FormGrid
+          fields={benefitsFields}
+          control={control}
+          label="Benefits"
+          disabled={disabled}
+        />
       </Box>
       <Box sx={{ mt: 3 }}>
         <FormGrid
@@ -327,6 +337,7 @@ const OthersForm = <T extends FieldValues>({ control }: OthersFormProps<T>) => {
           control={control}
           label="Cancellation Details"
           columns={2}
+          disabled={disabled}
         />
       </Box>
     </Box>

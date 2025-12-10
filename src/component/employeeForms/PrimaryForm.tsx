@@ -16,6 +16,7 @@ interface PrimaryFormProps<T extends FieldValues> {
   designationOptions?: SetupOption[];
   subStatusOptions?: SetupOption[];
   nationalityOptions?: SetupOption[];
+  disabled?: boolean;
 }
 
 const PrimaryForm = <T extends FieldValues>({
@@ -25,6 +26,7 @@ const PrimaryForm = <T extends FieldValues>({
   designationOptions = [],
   subStatusOptions = [],
   nationalityOptions = [],
+  disabled = false,
 }: PrimaryFormProps<T>) => {
   // Convert API options to dropdown format
   const formatOptions = (options: SetupOption[]): string[] => {
@@ -160,7 +162,11 @@ const PrimaryForm = <T extends FieldValues>({
                   size={{ md: isLarge ? 6 : 3, sm: 6, xs: 12 }}
                   key={field.name}
                 >
-                  <FormFieldSelector field={field} control={control} />
+                  <FormFieldSelector
+                    field={field}
+                    control={control}
+                    disabled={disabled}
+                  />
                 </Grid>
               );
             })}
@@ -183,6 +189,7 @@ const PrimaryForm = <T extends FieldValues>({
               control={control}
               label="Employee Photo"
               required={false}
+              disabled={disabled}
             />
           </Box>
         </Grid>

@@ -4,10 +4,12 @@ import FormGrid from "../formFields/FormGrid";
 
 interface FinanceFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const FinanceForm = <T extends FieldValues>({
   control,
+  disabled = false,
 }: FinanceFormProps<T>) => {
   const fields = [
     {
@@ -118,7 +120,7 @@ const FinanceForm = <T extends FieldValues>({
     },
   ];
 
-  return <FormGrid fields={fields} control={control} />;
+  return <FormGrid fields={fields} control={control} disabled={disabled} />;
 };
 
 export default FinanceForm;

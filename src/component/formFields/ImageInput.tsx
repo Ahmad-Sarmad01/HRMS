@@ -7,6 +7,7 @@ interface ImageInputProps<T extends FieldValues> {
   control: Control<T>;
   label: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 const ImageInput = <T extends FieldValues>({
@@ -14,6 +15,7 @@ const ImageInput = <T extends FieldValues>({
   control,
   label,
   required,
+  disabled = false,
 }: ImageInputProps<T>) => {
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -82,6 +84,7 @@ const ImageInput = <T extends FieldValues>({
             id="image-upload-input"
             type="file"
             accept="image/*"
+            disabled={disabled}
             style={{ display: "none" }}
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -96,6 +99,7 @@ const ImageInput = <T extends FieldValues>({
             variant="contained"
             component="label"
             htmlFor="image-upload-input"
+            disabled={disabled}
             sx={{
               width: "100%",
               textTransform: "none",
@@ -115,6 +119,7 @@ const ImageInput = <T extends FieldValues>({
           {/* CAMERA BUTTON */}
           <Button
             variant="outlined"
+            disabled={disabled}
             sx={{
               width: "100%",
               textTransform: "none",
@@ -135,6 +140,7 @@ const ImageInput = <T extends FieldValues>({
           {/* ID CARD BUTTON */}
           <Button
             variant="contained"
+            disabled={disabled}
             sx={{
               width: "100%",
               textTransform: "none",

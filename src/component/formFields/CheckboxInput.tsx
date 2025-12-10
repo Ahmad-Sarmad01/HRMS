@@ -13,6 +13,7 @@ interface CheckboxInputProps<T extends FieldValues> {
   control: Control<T>;
   label: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 const CheckboxInput = <T extends FieldValues>({
@@ -20,6 +21,7 @@ const CheckboxInput = <T extends FieldValues>({
   control,
   label,
   required = false,
+  disabled = false,
 }: CheckboxInputProps<T>) => {
   return (
     <Controller
@@ -33,6 +35,7 @@ const CheckboxInput = <T extends FieldValues>({
               <Checkbox
                 {...field}
                 checked={!!field.value}
+                disabled={disabled}
                 onChange={(e) => field.onChange(e.target.checked)}
                 sx={{ color: "#011527", "&.Mui-checked": { color: "#D9C48C" } }}
               />

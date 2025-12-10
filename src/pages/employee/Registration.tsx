@@ -1,6 +1,12 @@
 import { FC, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/store";
+import {
+  clearSelectedEmployee,
+  setIsEditable as setEditableInSlice,
+} from "../../store/slices/employeeSlice";
 import {
   Box,
   Tabs,
@@ -13,6 +19,11 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  TextField,
+  Paper,
+  List,
+  ListItem,
+  ListItemButton,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import BadgeIcon from "@mui/icons-material/Badge";
@@ -44,6 +55,7 @@ import {
 import {
   getDefaultFormValues,
   convertToAPIFormat,
+  convertFromAPIFormat,
   fieldNameMapping,
 } from "../../utils/fieldMapping";
 import { employeeService } from "../../services/employeeService";
@@ -51,6 +63,10 @@ import { setupService, SetupOption } from "../../services/setupService";
 
 const EmployeeRegistration: FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { selectedEmployee, isEditable: isEditableFromSlice } = useSelector(
+    (state: RootState) => state.employee
+  );
   const [activeBtn, setActiveBtn] = useState<number>(0);
   const [tabValue, setTabValue] = useState<number>(0);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
@@ -96,6 +112,12 @@ const EmployeeRegistration: FC = () => {
     religion: [],
   });
   const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+
+  // Search states
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const menuOpen = Boolean(menuAnchorEl);
 
@@ -146,6 +168,38 @@ const EmployeeRegistration: FC = () => {
 
     fetchSetupOptions();
   }, []);
+
+  // Load employee from slice on mount
+  useEffect(() => {
+    if (selectedEmployee) {
+      const formData = convertFromAPIFormat(selectedEmployee);
+      reset(formData);
+    }
+  }, [selectedEmployee, reset]);
+
+  // Debounced search effect
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const results = await employeeService.searchEmployees(searchQuery);
+        setSearchResults(results);
+        console.log("Search results:", results);
+      } catch (error) {
+        console.error("Error searching employees:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -210,6 +264,15 @@ const EmployeeRegistration: FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handleSelectEmployee = (employee: any) => {
+    const formData = convertFromAPIFormat(employee);
+    reset(formData);
+    setSearchResults([]);
+    setSearchQuery("");
+    setShowSearch(false);
+    dispatch(setEditableInSlice(false));
+  };
+
   const handlePillButtonClick = (index: number, title: string) => {
     setActiveBtn(index);
 
@@ -217,14 +280,25 @@ const EmployeeRegistration: FC = () => {
       // Clear form to new
       reset();
       setTabValue(0);
+      setShowSearch(false);
+      dispatch(clearSelectedEmployee());
     } else if (title === "Save") {
       // Trigger form submission
       handleSubmit(onSubmit)();
     } else if (title === "Back") {
       // Navigate to dashboard
       navigate("/dashboard");
+    } else if (title === "Search") {
+      // Toggle search
+      setShowSearch(!showSearch);
+      if (!showSearch) {
+        setSearchQuery("");
+        setSearchResults([]);
+      }
+    } else if (title === "Edit") {
+      // Enable form editing
+      dispatch(setEditableInSlice(true));
     }
-    // Handle other buttons (Edit, Search) as needed
   };
 
   const PillButton = ({
@@ -442,6 +516,42 @@ const EmployeeRegistration: FC = () => {
         </MenuItem>
       </Menu>
 
+      {showSearch && (
+        <Box sx={{ mt: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Search by Staff Code or Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            variant="outlined"
+            InputProps={{
+              endAdornment: isSearching ? <CircularProgress size={20} /> : null,
+            }}
+          />
+          {searchResults.length > 0 && (
+            <Paper
+              sx={{ mt: 1, maxHeight: 200, overflowY: "auto" }}
+              elevation={3}
+            >
+              <List>
+                {searchResults.map((employee, index) => (
+                  <ListItemButton
+                    key={index}
+                    onClick={() => handleSelectEmployee(employee)}
+                  >
+                    <ListItemText
+                      primary={`${employee.staff_Code || ""} - ${
+                        employee.staff_Name || employee.arabic_Name || "No Name"
+                      }`}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Paper>
+          )}
+        </Box>
+      )}
+
       {isLoadingOptions ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
@@ -454,6 +564,7 @@ const EmployeeRegistration: FC = () => {
           designationOptions={setupOptions.designation}
           subStatusOptions={setupOptions.subStatus}
           nationalityOptions={setupOptions.nationality}
+          disabled={!isEditableFromSlice}
         />
       )}
 
@@ -522,16 +633,33 @@ const EmployeeRegistration: FC = () => {
               positionOptions={setupOptions.position}
               addResponsibilityOptions={setupOptions.addResponsibility}
               religionOptions={setupOptions.religion}
+              disabled={!isEditableFromSlice}
             />
           )}
-          {tabValue === 1 && <PersonalForm control={control} />}
-          {tabValue === 2 && <DocumentsForm control={control} />}
-          {tabValue === 3 && <GeneralForm control={control} />}
-          {tabValue === 4 && <DependantForm control={control} />}
-          {tabValue === 5 && <LeaveForm control={control} />}
-          {tabValue === 6 && <FinanceForm control={control} />}
-          {tabValue === 7 && <PayrollForm control={control} />}
-          {tabValue === 8 && <OthersForm control={control} />}
+          {tabValue === 1 && (
+            <PersonalForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 2 && (
+            <DocumentsForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 3 && (
+            <GeneralForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 4 && (
+            <DependantForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 5 && (
+            <LeaveForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 6 && (
+            <FinanceForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 7 && (
+            <PayrollForm control={control} disabled={!isEditableFromSlice} />
+          )}
+          {tabValue === 8 && (
+            <OthersForm control={control} disabled={!isEditableFromSlice} />
+          )}
         </Box>
       </Box>
 

@@ -7,6 +7,7 @@ interface DateInputProps<T extends FieldValues> {
   control: Control<T>;
   label: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 const DateInput = <T extends FieldValues>({
@@ -14,6 +15,7 @@ const DateInput = <T extends FieldValues>({
   control,
   label,
   required = false,
+  disabled = false,
 }: DateInputProps<T>) => {
   return (
     <Box display="flex" flexDirection="column">
@@ -39,6 +41,7 @@ const DateInput = <T extends FieldValues>({
             value={field.value || ""}
             type="date"
             fullWidth
+            disabled={disabled}
             error={!!error}
             helperText={error?.message}
             InputLabelProps={{

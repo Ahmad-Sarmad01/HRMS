@@ -1,17 +1,17 @@
 import { FC, useEffect, useState } from "react";
 import { Box, CircularProgress, Snackbar, Alert } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { employeeService } from "../../services/employeeService";
 import { Employee } from "../../types/employee";
 import EmployeeTable from "../../component/employee/EmployeeTable";
-import EmployeeDetailModal from "../../component/employee/EmployeeDetailModal";
+import { setSelectedEmployee } from "../../store/slices/employeeSlice";
 
 const EmployeeList: FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -41,13 +41,9 @@ const EmployeeList: FC = () => {
   };
 
   const handleView = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedEmployee(null);
+    console.log("Viewing employee:", employee);
+    dispatch(setSelectedEmployee(employee));
+    navigate("/employees/new");
   };
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
@@ -61,12 +57,6 @@ const EmployeeList: FC = () => {
       ) : (
         <EmployeeTable employees={employees} onView={handleView} />
       )}
-
-      <EmployeeDetailModal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        employee={selectedEmployee}
-      />
 
       <Snackbar
         open={snackbar.open}

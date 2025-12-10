@@ -157,7 +157,7 @@ export const fieldNameMapping: Record<string, keyof EmployeeFormData> = {
   iloeDetails: "iloE_details",
   insuranceNo: "insurance_No",
   insuranceExpDate: "insurance_Expiry_Date",
-  
+
   // Cancellation Details
   visaCancelled: "visa_Cancelled",
   labourCardCancelled: "labour_Card_Cancelled",
@@ -201,11 +201,28 @@ export const convertToAPIFormat = (formData: Record<string, any>): any => {
   return apiData;
 };
 
-// Default values for the form
-export const getDefaultFormValues = (): Record<string, string> => {
-  const defaults: Record<string, string> = {};
-  Object.keys(fieldNameMapping).forEach((k) => {
-    defaults[k] = "";
+// Converts backend API data to frontend form format
+export const convertFromAPIFormat = (apiData: any): Record<string, any> => {
+  const formData: Record<string, any> = {};
+  const reverseMapping: Record<string, string> = {};
+
+  Object.entries(fieldNameMapping).forEach(([frontend, backend]) => {
+    reverseMapping[backend as string] = frontend;
+  });
+
+  Object.entries(apiData).forEach(([key, value]) => {
+    const frontendKey = reverseMapping[key] || key;
+    formData[frontendKey] = value ?? "";
+  });
+
+  return formData;
+};
+
+// Returns default form values with all fields set to empty strings
+export const getDefaultFormValues = (): Record<string, any> => {
+  const defaults: Record<string, any> = {};
+  Object.keys(fieldNameMapping).forEach((key) => {
+    defaults[key] = "";
   });
   return defaults;
 };

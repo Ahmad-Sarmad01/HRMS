@@ -35,10 +35,12 @@ interface DocumentItem {
 
 interface DocumentsFormProps<T extends FieldValues> {
   control: Control<T>;
+  disabled?: boolean;
 }
 
 const DocumentsForm = <T extends FieldValues>({
   control,
+  disabled = false,
 }: DocumentsFormProps<T>) => {
   const [rows, setRows] = useState<DocumentItem[]>([]);
   const [open, setOpen] = useState(false);
