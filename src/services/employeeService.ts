@@ -32,6 +32,21 @@ export const employeeService = {
     }
   },
 
+  async updateEmployee(data: any): Promise<any> {
+    try {
+      const response = await apiClient.put("/putemployee", data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error updating employee:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
   async searchEmployees(query: string): Promise<any[]> {
     try {
       const response = await apiClient.get(

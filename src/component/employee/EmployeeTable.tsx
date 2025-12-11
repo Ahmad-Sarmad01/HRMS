@@ -17,7 +17,7 @@ const EmployeeTable: FC<EmployeeTableProps> = ({ employees, onView }) => {
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1,
+      // flex: 1,
       renderCell: (params) => (
         <Button
           variant="contained"
@@ -44,7 +44,6 @@ const EmployeeTable: FC<EmployeeTableProps> = ({ employees, onView }) => {
             },
           },
         }}
-        checkboxSelection
         disableRowSelectionOnClick
       />
     </Box>

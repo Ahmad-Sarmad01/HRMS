@@ -3,55 +3,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store/store";
-import {
-  clearSelectedEmployee,
-  setIsEditable as setEditableInSlice,
-} from "../../store/slices/employeeSlice";
-import {
-  Box,
-  Tabs,
-  Tab,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Button,
-  CircularProgress,
-  Alert,
-  Snackbar,
-  TextField,
-  Paper,
-  List,
-  ListItem,
-  ListItemButton,
-} from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import BadgeIcon from "@mui/icons-material/Badge";
-import PersonIcon from "@mui/icons-material/Person";
-import DescriptionIcon from "@mui/icons-material/Description";
-import InfoIcon from "@mui/icons-material/Info";
-import PeopleIcon from "@mui/icons-material/People";
-import BeachAccessIcon from "@mui/icons-material/BeachAccess";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import PaidIcon from "@mui/icons-material/Paid";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import TableViewIcon from "@mui/icons-material/TableView";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import PrintIcon from "@mui/icons-material/Print";
-import { TopPillButtonData } from "./content";
-import {
-  PrimaryForm,
-  OfficialForm,
-  PersonalForm,
-  DocumentsForm,
-  GeneralForm,
-  DependantForm,
-  LeaveForm,
-  FinanceForm,
-  PayrollForm,
-  OthersForm,
-} from "../../component/employeeForms";
+import { clearSelectedEmployee } from "../../store/slices/employeeSlice";
+import { Box, CircularProgress, Alert, Snackbar } from "@mui/material";
+import { PrimaryForm } from "../../component/employeeForms";
+import EmployeeRegistrationButtons from "../../component/employee/EmployeeRegistrationButtons";
+import EmployeeFormTabs from "../../component/employee/EmployeeFormTabs";
 import {
   getDefaultFormValues,
   convertToAPIFormat,
@@ -64,12 +20,10 @@ import { setupService, SetupOption } from "../../services/setupService";
 const EmployeeRegistration: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { selectedEmployee, isEditable: isEditableFromSlice } = useSelector(
+  const { selectedEmployee } = useSelector(
     (state: RootState) => state.employee
   );
   const [activeBtn, setActiveBtn] = useState<number>(0);
-  const [tabValue, setTabValue] = useState<number>(0);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -112,14 +66,6 @@ const EmployeeRegistration: FC = () => {
     religion: [],
   });
   const [isLoadingOptions, setIsLoadingOptions] = useState(true);
-
-  // Search states
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const menuOpen = Boolean(menuAnchorEl);
 
   const {
     control,
@@ -177,47 +123,6 @@ const EmployeeRegistration: FC = () => {
     }
   }, [selectedEmployee, reset]);
 
-  // Debounced search effect
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const results = await employeeService.searchEmployees(searchQuery);
-        setSearchResults(results);
-        console.log("Search results:", results);
-      } catch (error) {
-        console.error("Error searching employees:", error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  };
-
-  const handleMenuItemClick = (action: string) => {
-    console.log(`${action} clicked`);
-    handleMenuClose();
-  };
-
   const onSubmit = async (data: any) => {
     try {
       setIsSubmitting(true);
@@ -235,16 +140,27 @@ const EmployeeRegistration: FC = () => {
 
       console.log("Submitting data:", apiBody);
 
-      const response = await employeeService.createEmployee(apiBody as any);
+      // Use PUT if editing existing employee, POST if creating new
+      const response = selectedEmployee
+        ? await employeeService.updateEmployee(apiBody as any)
+        : await employeeService.createEmployee(apiBody as any);
+
+      if (!response.isSuccess) {
+        throw new Error(
+          response.message ||
+            `Failed to ${selectedEmployee ? "update" : "register"} employee`
+        );
+      }
 
       setSnackbar({
         open: true,
-        message: "Employee registered successfully!",
+        message: selectedEmployee
+          ? "Employee updated successfully!"
+          : "Employee registered successfully!",
         severity: "success",
       });
 
-      reset();
-      setTabValue(0);
+      reset(getDefaultFormValues());
 
       console.log("Response:", response);
     } catch (error: any) {
@@ -264,404 +180,67 @@ const EmployeeRegistration: FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handleSelectEmployee = (employee: any) => {
-    const formData = convertFromAPIFormat(employee);
-    reset(formData);
-    setSearchResults([]);
-    setSearchQuery("");
-    setShowSearch(false);
-    dispatch(setEditableInSlice(false));
-  };
-
   const handlePillButtonClick = (index: number, title: string) => {
     setActiveBtn(index);
 
     if (title === "New") {
-      // Clear form to new
-      reset();
-      setTabValue(0);
-      setShowSearch(false);
+      // Clear form to new with empty default values
+      reset(getDefaultFormValues());
       dispatch(clearSelectedEmployee());
     } else if (title === "Save") {
       // Trigger form submission
       handleSubmit(onSubmit)();
-    } else if (title === "Back") {
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } else if (title === "Search") {
-      // Toggle search
-      setShowSearch(!showSearch);
-      if (!showSearch) {
-        setSearchQuery("");
-        setSearchResults([]);
-      }
-    } else if (title === "Edit") {
-      // Enable form editing
-      dispatch(setEditableInSlice(true));
     }
-  };
-
-  const PillButton = ({
-    children,
-    index,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    index: number;
-    onClick: (i: number) => void;
-  }) => {
-    const isActive = index === activeBtn;
-
-    return (
-      <Box
-        component="button"
-        onClick={() => onClick(index)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 0.5,
-          px: 2,
-          py: 0.5,
-          borderRadius: "12px",
-          border: "1px solid var(--primary)",
-          color: isActive ? "var(--text-light)" : "var(--primary)",
-          bgcolor: isActive ? "var(--primary)" : "transparent",
-          fontWeight: 600,
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-          boxShadow: isActive
-            ? "0 4px 8px rgba(0,0,0,0.2)"
-            : "0 2px 4px rgba(0,0,0,0.1)",
-          "&:hover": isActive
-            ? { transform: "translateY(-2px)" }
-            : {
-                bgcolor: "var(--primary)",
-                color: "var(--text-light)",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                transform: "translateY(-2px)",
-              },
-        }}
-      >
-        {children}
-      </Box>
-    );
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box
-        gap={1}
-        height={40}
-        boxShadow="0 2px 6px rgba(0,0,0,0.05)"
-        borderRadius={2}
-        p={1}
-        border="1px solid var(--primary)"
-        display="flex"
-        alignItems="center"
         sx={{
-          overflowX: "auto",
-          scrollbarWidth: "none",
-          "&::-webkit-scrollbar": { display: "none" },
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: { xs: "stretch", md: "center" },
+          justifyContent: "space-between",
+          gap: 2,
+          mb: 2,
         }}
       >
-        {TopPillButtonData.map((e, i) => {
-          const Icon = e.icon;
-          const isLastButton = i === TopPillButtonData.length - 1;
-
-          return (
-            <Box
-              key={i}
-              sx={{ position: isLastButton ? "relative" : "initial" }}
-              onMouseEnter={isLastButton ? handleMenuOpen : undefined}
-              onMouseLeave={isLastButton ? handleMenuClose : undefined}
-            >
-              <PillButton
-                index={i}
-                onClick={(index) => handlePillButtonClick(index, e.title)}
-              >
-                {isSubmitting && (
-                  <CircularProgress size={16} sx={{ mr: 0.5 }} />
-                )}
-                <Icon />
-                {e.title}
-              </PillButton>
-            </Box>
-          );
-        })}
-      </Box>
-
-      {/* Hamburger Menu */}
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={menuOpen}
-        onClose={handleMenuClose}
-        MenuListProps={{
-          onMouseEnter: () => setMenuAnchorEl(menuAnchorEl),
-          onMouseLeave: handleMenuClose,
-        }}
-        slotProps={{
-          paper: {
-            onMouseEnter: () => setMenuAnchorEl(menuAnchorEl),
-            onMouseLeave: handleMenuClose,
-          },
-        }}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        sx={{
-          "& .MuiPaper-root": {
-            mt: 0.5,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            borderRadius: 2,
-            minWidth: 180,
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() => handleMenuItemClick("Bulk upload")}
+        <Box
+          component="h1"
           sx={{
-            py: 1.5,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: "rgba(217, 196, 140, 0.15)",
-              transform: "translateX(4px)",
-            },
+            fontSize: { xs: "1.25rem", md: "1.5rem" },
+            fontWeight: 600,
+            color: "var(--primary)",
+            m: 0,
           }}
         >
-          <ListItemIcon>
-            <UploadFileIcon fontSize="small" sx={{ color: "#D9C48C" }} />
-          </ListItemIcon>
-          <ListItemText
-            primary="Bulk upload"
-            primaryTypographyProps={{
-              fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "#011527",
-            }}
-          />
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleMenuItemClick("Export to Excel")}
-          sx={{
-            py: 1.5,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: "rgba(217, 196, 140, 0.15)",
-              transform: "translateX(4px)",
-            },
-          }}
-        >
-          <ListItemIcon>
-            <TableViewIcon fontSize="small" sx={{ color: "#10B981" }} />
-          </ListItemIcon>
-          <ListItemText
-            primary="Export to Excel"
-            primaryTypographyProps={{
-              fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "#011527",
-            }}
-          />
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleMenuItemClick("Export to PDF")}
-          sx={{
-            py: 1.5,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: "rgba(217, 196, 140, 0.15)",
-              transform: "translateX(4px)",
-            },
-          }}
-        >
-          <ListItemIcon>
-            <PictureAsPdfIcon fontSize="small" sx={{ color: "#EF4444" }} />
-          </ListItemIcon>
-          <ListItemText
-            primary="Export to PDF"
-            primaryTypographyProps={{
-              fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "#011527",
-            }}
-          />
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleMenuItemClick("Print")}
-          sx={{
-            py: 1.5,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: "rgba(217, 196, 140, 0.15)",
-              transform: "translateX(4px)",
-            },
-          }}
-        >
-          <ListItemIcon>
-            <PrintIcon fontSize="small" sx={{ color: "#86764e" }} />
-          </ListItemIcon>
-          <ListItemText
-            primary="Print"
-            primaryTypographyProps={{
-              fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "#011527",
-            }}
-          />
-        </MenuItem>
-      </Menu>
-
-      {showSearch && (
-        <Box sx={{ mt: 2, mb: 2 }}>
-          <TextField
-            fullWidth
-            label="Search by Staff Code or Name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            variant="outlined"
-            InputProps={{
-              endAdornment: isSearching ? <CircularProgress size={20} /> : null,
-            }}
-          />
-          {searchResults.length > 0 && (
-            <Paper
-              sx={{ mt: 1, maxHeight: 200, overflowY: "auto" }}
-              elevation={3}
-            >
-              <List>
-                {searchResults.map((employee, index) => (
-                  <ListItemButton
-                    key={index}
-                    onClick={() => handleSelectEmployee(employee)}
-                  >
-                    <ListItemText
-                      primary={`${employee.staff_Code || ""} - ${
-                        employee.staff_Name || employee.arabic_Name || "No Name"
-                      }`}
-                    />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Paper>
-          )}
+          New Employee Registration
         </Box>
-      )}
+        <EmployeeRegistrationButtons
+          activeBtn={activeBtn}
+          isSubmitting={isSubmitting}
+          onButtonClick={handlePillButtonClick}
+        />
+      </Box>
 
       {isLoadingOptions ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
         </Box>
       ) : (
-        <PrimaryForm
-          control={control}
-          statusOptions={setupOptions.status}
-          branchOptions={setupOptions.branch}
-          designationOptions={setupOptions.designation}
-          subStatusOptions={setupOptions.subStatus}
-          nationalityOptions={setupOptions.nationality}
-          disabled={!isEditableFromSlice}
-        />
+        <>
+          <PrimaryForm
+            control={control}
+            statusOptions={setupOptions.status}
+            branchOptions={setupOptions.branch}
+            designationOptions={setupOptions.designation}
+            subStatusOptions={setupOptions.subStatus}
+            nationalityOptions={setupOptions.nationality}
+          />
+
+          <EmployeeFormTabs control={control} setupOptions={setupOptions} />
+        </>
       )}
-
-      {/* Tabs Section */}
-      <Box
-        sx={{
-          mt: 3,
-          border: "1px solid #E5E7EB",
-          borderRadius: 2,
-          backgroundColor: "#FFFFFF",
-        }}
-      >
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
-            borderBottom: "1px solid #E5E7EB",
-            "& .MuiTab-root": {
-              textTransform: "none",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              color: "#86764e",
-              minHeight: 48,
-              "&.Mui-selected": {
-                color: "#011527",
-              },
-            },
-            "& .MuiTabs-indicator": {
-              backgroundColor: "#D9C48C",
-              height: 3,
-            },
-          }}
-        >
-          <Tab icon={<BadgeIcon />} iconPosition="start" label="Official" />
-          <Tab icon={<PersonIcon />} iconPosition="start" label="Personal" />
-          <Tab
-            icon={<DescriptionIcon />}
-            iconPosition="start"
-            label="Documents"
-          />
-          <Tab icon={<InfoIcon />} iconPosition="start" label="General" />
-          <Tab icon={<PeopleIcon />} iconPosition="start" label="Dependant" />
-          <Tab icon={<BeachAccessIcon />} iconPosition="start" label="Leave" />
-          <Tab
-            icon={<AccountBalanceWalletIcon />}
-            iconPosition="start"
-            label="Finance"
-          />
-          <Tab icon={<PaidIcon />} iconPosition="start" label="Payroll" />
-          <Tab icon={<MoreHorizIcon />} iconPosition="start" label="Others" />
-        </Tabs>
-
-        <Box sx={{ p: 3 }}>
-          {tabValue === 0 && (
-            <OfficialForm
-              control={control}
-              genderOptions={setupOptions.gender}
-              visaTypeOptions={setupOptions.visaType}
-              sectionOptions={setupOptions.section}
-              visaSponsorOptions={setupOptions.visaSponsor}
-              employmentTypeOptions={setupOptions.employmentType}
-              lineManagerOptions={setupOptions.lineManager}
-              labourCardStatusOptions={setupOptions.labourCardStatus}
-              positionOptions={setupOptions.position}
-              addResponsibilityOptions={setupOptions.addResponsibility}
-              religionOptions={setupOptions.religion}
-              disabled={!isEditableFromSlice}
-            />
-          )}
-          {tabValue === 1 && (
-            <PersonalForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 2 && (
-            <DocumentsForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 3 && (
-            <GeneralForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 4 && (
-            <DependantForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 5 && (
-            <LeaveForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 6 && (
-            <FinanceForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 7 && (
-            <PayrollForm control={control} disabled={!isEditableFromSlice} />
-          )}
-          {tabValue === 8 && (
-            <OthersForm control={control} disabled={!isEditableFromSlice} />
-          )}
-        </Box>
-      </Box>
 
       {/* Snackbar for notifications */}
       <Snackbar

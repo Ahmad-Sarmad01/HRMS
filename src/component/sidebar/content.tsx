@@ -48,7 +48,7 @@ const menuSections = [
             key: "new-registration",
           },
           {
-            title: "Employee List",
+            title: "Employee Register",
             icon: <ListAltIcon />,
             route: "/employees/list",
             key: "employee-list",
