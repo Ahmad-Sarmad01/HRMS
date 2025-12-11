@@ -25,7 +25,13 @@ import { clearAuthData } from "../../utils/localStorage";
 
 const expandedWidth = 240;
 
-const Sidebar = ({ isOpen }: { isOpen: any }) => {
+const Sidebar = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: any;
+  onClose?: () => void;
+}) => {
   const theme = useTheme();
   const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
   const [hoverOpen, setHoverOpen] = useState<boolean>(false);
@@ -74,6 +80,11 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
           to={item.route}
           style={{ textDecoration: "none", color: "inherit" }}
           key={item.key || item.title}
+          onClick={() => {
+            if (isMobile && onClose) {
+              onClose();
+            }
+          }}
         >
           <ListItemButton
             sx={{
@@ -219,7 +230,7 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
   return (
     <>
       {/* Floating Toggle Button */}
-      {!isSidebarOpen && (
+      {!isSidebarOpen && !isMobile && (
         <IconButton
           onMouseEnter={handleSidebarOpen}
           sx={{
@@ -252,7 +263,7 @@ const Sidebar = ({ isOpen }: { isOpen: any }) => {
       <Drawer
         variant="permanent"
         open={isSidebarOpen}
-        onMouseLeave={hoverOpen ? handleSidebarClose : undefined}
+        onMouseLeave={!isMobile && hoverOpen ? handleSidebarClose : undefined}
         sx={{
           position: isMobile ? "absolute" : "sticky",
           width: isSidebarOpen ? expandedWidth : 0,

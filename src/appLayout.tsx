@@ -11,13 +11,22 @@ const AppLayout = () => {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
+  const closeSidebar = () => setIsOpen(false);
+
   return (
     <Box sx={{ display: "flex" }}>
-      <Sidebar isOpen={isOpen} />
-      
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
+      <Sidebar isOpen={isOpen} onClose={closeSidebar} />
+
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+        }}
+      >
         <Topbar toggleSidebar={toggleSidebar} isOpen={isOpen} />
-        
+
         <Box
           component="div"
           sx={{
