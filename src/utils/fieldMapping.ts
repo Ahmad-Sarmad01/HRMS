@@ -218,11 +218,46 @@ export const convertFromAPIFormat = (apiData: any): Record<string, any> => {
   return formData;
 };
 
-// Returns default form values with all fields set to empty strings
+// Fields that should have "0.00" as default (numeric and ID fields)
+const numericFields = [
+  // Numeric fields
+  "age",
+  "probationDays",
+  "basicSalary",
+  "ministrySalary",
+  "grossSalary",
+  "leaveSalary",
+  "leavePerYear",
+  "rateIncrementByPercent",
+  "periodsPerWeek",
+  "ticketCount",
+  "noOfChildrenForTuition",
+  "transportation",
+  "ticketAmount",
+  "insuranceAmount",
+  "pension",
+  "noticePeriod",
+  "seniorityNo",
+
+  // ID and code fields
+  "staffCode",
+  "uaeMobileNo",
+  "uaePhoneNo",
+  "rfid",
+  "emiratesIdNo",
+  "moeRegistrationNo",
+  "molNumber",
+  "routingCode",
+  "machineId",
+  "insuranceNo",
+  "companyID",
+];
+
+// Returns default form values with numeric/ID fields set to "0.00" and others (including dates) to empty strings
 export const getDefaultFormValues = (): Record<string, any> => {
   const defaults: Record<string, any> = {};
   Object.keys(fieldNameMapping).forEach((key) => {
-    defaults[key] = "";
+    defaults[key] = numericFields.includes(key) ? "0.00" : "";
   });
   return defaults;
 };
