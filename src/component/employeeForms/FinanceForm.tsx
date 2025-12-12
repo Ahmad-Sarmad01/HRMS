@@ -18,7 +18,7 @@ const FinanceForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Bank Transfer", "Cash", "Cheque"],
-      required: false,
+      required: true,
     },
     {
       name: "paymentMode",
@@ -33,21 +33,21 @@ const FinanceForm = <T extends FieldValues>({
       label: "Bank Swift Code",
       type: "text",
       fieldSize: "normal",
-      required: false,
+      required: true,
     },
     {
       name: "molNumber",
       label: "MOL Number",
       type: "text",
       fieldSize: "normal",
-      required: false,
+      required: true,
     },
     {
       name: "routingCode",
       label: "Routing Code",
       type: "text",
       fieldSize: "normal",
-      required: false,
+      required: true,
     },
     {
       name: "salaryMode",
@@ -63,14 +63,14 @@ const FinanceForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Paid", "Unpaid"],
-      required: false,
+      required: true,
     },
     {
       name: "leavePerYear",
       label: "Leave Per Year",
       type: "text",
       fieldSize: "normal",
-      required: false,
+      required: true,
     },
     {
       name: "ticketEligibility",
@@ -78,7 +78,7 @@ const FinanceForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Yes", "No"],
-      required: false,
+      required: true,
     },
     {
       name: "loanAccount",
@@ -86,7 +86,7 @@ const FinanceForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Active", "Inactive"],
-      required: false,
+      required: true,
     },
     {
       name: "accountGroup",
@@ -94,7 +94,7 @@ const FinanceForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Group A", "Group B", "Group C"],
-      required: false,
+      required: true,
     },
     {
       name: "ticketPaymentMode",
@@ -102,21 +102,21 @@ const FinanceForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Cash", "Reimbursement"],
-      required: false,
+      required: true,
     },
     {
       name: "financialRemarks",
       label: "Financial Remarks",
       type: "text",
       fieldSize: "large",
-      required: false,
+      required: true,
     },
     {
       name: "excludeFromPayroll",
       label: "Exclude From Payroll",
       type: "checkbox",
       fieldSize: "normal",
-      required: false,
+      required: true,
     },
   ];
 
