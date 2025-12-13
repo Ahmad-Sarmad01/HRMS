@@ -216,11 +216,11 @@ const StaffAppointment: FC = () => {
       setShowList(false);
       setShowSearch(false);
     } else if (title === "Save") {
-      // Save/Update
-      handleSubmit(onSubmit)();
+      // Save/Update - handled by form submission
+      // The button will trigger form submit
     } else if (index === 2) {
-      // Submit for Approval
-      handleSubmit(onSubmit)();
+      // Submit for Approval - handled by form submission
+      // The button will trigger form submit
     } else if (index === 3 && title === "Search") {
       // Toggle search
       setShowSearch(!showSearch);

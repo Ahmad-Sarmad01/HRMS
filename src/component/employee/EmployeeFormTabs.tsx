@@ -1,5 +1,6 @@
-import { FC, useState } from "react";
-import { Box, Tabs, Tab } from "@mui/material";
+import { FC, useState, useMemo } from "react";
+import { Box, Tabs, Tab, Badge } from "@mui/material";
+import { FieldErrors } from "react-hook-form";
 import BadgeIcon from "@mui/icons-material/Badge";
 import PersonIcon from "@mui/icons-material/Person";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -24,17 +25,220 @@ import {
 interface EmployeeFormTabsProps {
   control: any;
   setupOptions: any;
+  errors?: FieldErrors;
 }
 
 const EmployeeFormTabs: FC<EmployeeFormTabsProps> = ({
   control,
   setupOptions,
+  errors = {},
 }) => {
   const [tabValue, setTabValue] = useState<number>(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  // Define which fields belong to which tab
+  const tabFieldMap = useMemo(
+    () => ({
+      0: [
+        // Official
+        "dateOfBirth",
+        "age",
+        "gender",
+        "visaType",
+        "section",
+        "visaSponsor",
+        "employmentType",
+        "lineManager1",
+        "lineManager2",
+        "probationDays",
+        "probationEndDate",
+        "visaDesignation",
+        "resignationDate",
+        "noticePeriod",
+        "lastWorkingDate",
+        "adekStatus",
+        "adekDesignation",
+        "currentGrade",
+        "contractExpiryDate",
+        "modifiedBy",
+        "modifiedDate",
+        "labourCardStatus",
+        "speciality",
+        "position",
+        "additionalResponsibility",
+        "rfid",
+        "religion",
+        "emiratesIdNo",
+        "emiratesIdExpiryDate",
+        "moeRegistrationNo",
+        "approvedFor",
+        "tlsStatus",
+        "tlsExpiryDate",
+        "seniorityNo",
+        "actualJoiningDate",
+        "remarks",
+        "signature",
+      ],
+      1: [
+        // Personal
+        "flatNoBuildingName",
+        "streetName",
+        "uaePhoneNo",
+        "area",
+        "emirates",
+        "poBox",
+        "isApprover",
+        "homeAddress1",
+        "homeAddress2",
+        "homeCountry",
+        "homeContactName",
+        "homeCountryContact",
+        "emergencyName",
+        "emergencyMobile",
+        "emergencyAddress",
+        "emergencyRelation",
+        "maritalStatus",
+        "bloodGroup",
+        "placeOfBirth",
+        "countryOfBirth",
+        "gratuityAs",
+        "gratuityStartDate",
+        "gratuityEndDate",
+        "leaveSalaryAs",
+        "insuranceAs",
+        "ticketAs",
+      ],
+      2: [
+        // Documents - Uses DataGrid, no form validation fields
+      ],
+      3: [
+        // General - Uses DataGrid, no form validation fields
+      ],
+      4: [
+        // Dependant - Uses DataGrid, no form validation fields
+      ],
+      5: [
+        // Leave - Uses DataGrid, no form validation fields
+      ],
+      6: [
+        // Finance
+        "paymentType",
+        "paymentMode",
+        "bankSwiftCode",
+        "molNumber",
+        "routingCode",
+        "salaryMode",
+        "leaveSalary",
+        "leavePerYear",
+        "ticketEligibility",
+        "loanAccount",
+        "accountGroup",
+        "ticketPaymentMode",
+        "financialRemarks",
+        "excludeFromPayroll",
+      ],
+      7: [
+        // Payroll
+        "basicSalary",
+        "ministrySalary",
+        "grossSalary",
+        "accommodationAmount",
+        "startDate1",
+        "endDate1",
+        "educationalReimbursement",
+        "startDate2",
+        "endDate2",
+        "creditAccount",
+        "ibanNo",
+        "employeeBank",
+      ],
+      8: [
+        // Others
+        "staffNameAsPerPassport",
+        "firstName",
+        "middleName",
+        "lastName",
+        "terminalBenefitsNominee",
+        "contractType",
+        "nomineeRelation",
+        "leaveCategory",
+        "rateIncrementByPercent",
+        "periodsPerWeek",
+        "childTuition",
+        "memo",
+        "machineId",
+        "attendanceShift",
+        "employeeBranch",
+        "specialRecognition",
+        "airTicketSector",
+        "ticketCount",
+        "directReportingTo",
+        "noOfChildrenForTuition",
+        "replacement",
+        "programLeader",
+        "equivalency",
+        "transportation",
+        "insuranceEligibility",
+        "insuranceProvider",
+        "schoolAccommodationProvided",
+        "insuranceCategory",
+        "ticketAmount",
+        "insuranceAmount",
+        "pensionAccount",
+        "pensionCategory",
+        "pension",
+        "iloeDetails",
+        "insuranceNo",
+        "insuranceExpDate",
+        "visaCancelled",
+        "labourCardCancelled",
+        "visaCancelledDate",
+        "labourCardCancelledDate",
+        "idCard",
+        "companyID",
+      ],
+    }),
+    []
+  );
+
+  // Check if a tab has errors
+  const hasTabErrors = useMemo(() => {
+    const tabErrors: Record<number, boolean> = {};
+
+    Object.entries(tabFieldMap).forEach(([tabIndex, fields]) => {
+      const hasError = fields.some((field) => errors[field]);
+      tabErrors[Number(tabIndex)] = hasError;
+    });
+
+    return tabErrors;
+  }, [errors, tabFieldMap]);
+
+  // Custom tab component with error indicator
+  const TabWithError: FC<{
+    icon: React.ReactElement;
+    label: string;
+    hasError: boolean;
+    isActive: boolean;
+  }> = ({ icon, label, hasError, isActive }) => (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {icon}
+      <span>{label}</span>
+      {hasError && !isActive && (
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            backgroundColor: "#ef4444",
+            ml: 0.5,
+          }}
+        />
+      )}
+    </Box>
+  );
 
   return (
     <Box
@@ -68,27 +272,118 @@ const EmployeeFormTabs: FC<EmployeeFormTabsProps> = ({
           },
         }}
       >
-        <Tab icon={<BadgeIcon />} iconPosition="start" label="Official" />
-        <Tab icon={<PersonIcon />} iconPosition="start" label="Personal" />
+        <Tab
+          icon={<BadgeIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Official"
+              hasError={hasTabErrors[0]}
+              isActive={tabValue === 0}
+            />
+          }
+        />
+        <Tab
+          icon={<PersonIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Personal"
+              hasError={hasTabErrors[1]}
+              isActive={tabValue === 1}
+            />
+          }
+        />
         <Tab
           icon={<DescriptionIcon />}
           iconPosition="start"
-          label="Documents"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Documents"
+              hasError={hasTabErrors[2]}
+              isActive={tabValue === 2}
+            />
+          }
         />
-        <Tab icon={<InfoIcon />} iconPosition="start" label="General" />
-        <Tab icon={<PeopleIcon />} iconPosition="start" label="Dependant" />
-        <Tab icon={<BeachAccessIcon />} iconPosition="start" label="Leave" />
+        <Tab
+          icon={<InfoIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="General"
+              hasError={hasTabErrors[3]}
+              isActive={tabValue === 3}
+            />
+          }
+        />
+        <Tab
+          icon={<PeopleIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Dependant"
+              hasError={hasTabErrors[4]}
+              isActive={tabValue === 4}
+            />
+          }
+        />
+        <Tab
+          icon={<BeachAccessIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Leave"
+              hasError={hasTabErrors[5]}
+              isActive={tabValue === 5}
+            />
+          }
+        />
         <Tab
           icon={<AccountBalanceWalletIcon />}
           iconPosition="start"
-          label="Finance"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Finance"
+              hasError={hasTabErrors[6]}
+              isActive={tabValue === 6}
+            />
+          }
         />
-        <Tab icon={<PaidIcon />} iconPosition="start" label="Payroll" />
-        <Tab icon={<MoreHorizIcon />} iconPosition="start" label="Others" />
+        <Tab
+          icon={<PaidIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Payroll"
+              hasError={hasTabErrors[7]}
+              isActive={tabValue === 7}
+            />
+          }
+        />
+        <Tab
+          icon={<MoreHorizIcon />}
+          iconPosition="start"
+          label={
+            <TabWithError
+              icon={<></>}
+              label="Others"
+              hasError={hasTabErrors[8]}
+              isActive={tabValue === 8}
+            />
+          }
+        />
       </Tabs>
 
       <Box sx={{ p: 3 }}>
-        {tabValue === 0 && (
+        <Box sx={{ display: tabValue === 0 ? "block" : "none" }}>
           <OfficialForm
             control={control}
             genderOptions={setupOptions.gender}
@@ -102,15 +397,31 @@ const EmployeeFormTabs: FC<EmployeeFormTabsProps> = ({
             addResponsibilityOptions={setupOptions.addResponsibility}
             religionOptions={setupOptions.religion}
           />
-        )}
-        {tabValue === 1 && <PersonalForm control={control} />}
-        {tabValue === 2 && <DocumentsForm control={control} />}
-        {tabValue === 3 && <GeneralForm control={control} />}
-        {tabValue === 4 && <DependantForm control={control} />}
-        {tabValue === 5 && <LeaveForm control={control} />}
-        {tabValue === 6 && <FinanceForm control={control} />}
-        {tabValue === 7 && <PayrollForm control={control} />}
-        {tabValue === 8 && <OthersForm control={control} />}
+        </Box>
+        <Box sx={{ display: tabValue === 1 ? "block" : "none" }}>
+          <PersonalForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 2 ? "block" : "none" }}>
+          <DocumentsForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
+          <GeneralForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
+          <DependantForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 5 ? "block" : "none" }}>
+          <LeaveForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 6 ? "block" : "none" }}>
+          <FinanceForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 7 ? "block" : "none" }}>
+          <PayrollForm control={control} />
+        </Box>
+        <Box sx={{ display: tabValue === 8 ? "block" : "none" }}>
+          <OthersForm control={control} />
+        </Box>
       </Box>
     </Box>
   );

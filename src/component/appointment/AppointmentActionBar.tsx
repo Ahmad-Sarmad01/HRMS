@@ -77,6 +77,7 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
             <>
               <PillButton
                 index={0}
+                type="submit"
                 onClick={() => onButtonClick(0, "Save")}
                 isActive={activeBtn === 0}
               >
@@ -94,6 +95,7 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
               </PillButton>
               <PillButton
                 index={2}
+                type="submit"
                 onClick={() => onButtonClick(2)}
                 isActive={activeBtn === 2}
               >

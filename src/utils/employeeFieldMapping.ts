@@ -184,7 +184,12 @@ export const convertToAPIFormat = (formData: Record<string, any>): any => {
       ) {
         flatten(value);
       } else {
-        apiData[apiKey] = value ?? "";
+        // Convert boolean values to "Yes"/"No" strings
+        if (typeof value === "boolean") {
+          apiData[apiKey] = value ? "Yes" : "No";
+        } else {
+          apiData[apiKey] = value ?? "";
+        }
       }
     });
   };
@@ -197,6 +202,9 @@ export const convertToAPIFormat = (formData: Record<string, any>): any => {
       apiData[apiKey] = "";
     }
   }
+
+  // Add required 'request' field
+  apiData.request = "employee_registration";
 
   return apiData;
 };
@@ -212,7 +220,13 @@ export const convertFromAPIFormat = (apiData: any): Record<string, any> => {
 
   Object.entries(apiData).forEach(([key, value]) => {
     const frontendKey = reverseMapping[key] || key;
-    formData[frontendKey] = value ?? "";
+
+    // Convert "Yes"/"No" strings back to boolean
+    if (value === "Yes" || value === "No") {
+      formData[frontendKey] = value === "Yes";
+    } else {
+      formData[frontendKey] = value ?? "";
+    }
   });
 
   return formData;

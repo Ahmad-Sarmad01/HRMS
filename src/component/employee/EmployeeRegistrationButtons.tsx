@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import { Plus, Save} from "lucide-react";
+import { Plus, Save } from "lucide-react";
 import PillButton from "../buttons/pillButton";
 
 interface EmployeeRegistrationButtonsProps {
@@ -45,6 +45,7 @@ const EmployeeRegistrationButtons: FC<EmployeeRegistrationButtonsProps> = ({
           <PillButton
             key={i}
             index={i}
+            type={e.title === "Save" ? "submit" : "button"}
             onClick={(index) => onButtonClick(index, e.title)}
             isActive={i === activeBtn}
           >

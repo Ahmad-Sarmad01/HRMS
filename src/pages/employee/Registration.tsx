@@ -4,7 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store/store";
 import { clearSelectedEmployee } from "../../store/slices/employeeSlice";
-import { Box, CircularProgress, Alert, Snackbar } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Alert,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import { PrimaryForm } from "../../component/employeeForms";
 import EmployeeRegistrationButtons from "../../component/employee/EmployeeRegistrationButtons";
 import EmployeeFormTabs from "../../component/employee/EmployeeFormTabs";
@@ -18,13 +29,13 @@ import { employeeService } from "../../services/employeeService";
 import { setupService, SetupOption } from "../../services/setupService";
 
 const EmployeeRegistration: FC = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { selectedEmployee } = useSelector(
     (state: RootState) => state.employee
   );
   const [activeBtn, setActiveBtn] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showNewConfirmDialog, setShowNewConfirmDialog] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -72,6 +83,7 @@ const EmployeeRegistration: FC = () => {
     handleSubmit,
     reset,
     formState: { errors },
+    trigger,
   } = useForm({
     defaultValues: getDefaultFormValues(),
     mode: "onBlur",
@@ -127,16 +139,8 @@ const EmployeeRegistration: FC = () => {
     try {
       setIsSubmitting(true);
 
-      // Build the form payload using the frontend->API field mapping
-      const fullFormData = getDefaultFormValues();
-      Object.keys(fullFormData).forEach((frontendKey) => {
-        if ((data as any)[frontendKey] !== undefined) {
-          fullFormData[frontendKey] = (data as any)[frontendKey];
-        }
-      });
-
-      // Convert to API format (maps keys to backend keys)
-      const apiBody = convertToAPIFormat(fullFormData);
+      // Convert to API format directly from submitted form data
+      const apiBody = convertToAPIFormat(data);
 
       console.log("Submitting data:", apiBody);
 
@@ -180,14 +184,37 @@ const EmployeeRegistration: FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handlePillButtonClick = (index: number, title: string) => {
+  const handleNewClick = () => {
+    setShowNewConfirmDialog(true);
+  };
+
+  const handleConfirmNew = () => {
+    reset(getDefaultFormValues());
+    dispatch(clearSelectedEmployee());
+    setShowNewConfirmDialog(false);
+  };
+
+  const handleCancelNew = () => {
+    setShowNewConfirmDialog(false);
+  };
+
+  const handlePillButtonClick = async (index: number, title: string) => {
     setActiveBtn(index);
 
     if (title === "New") {
-      // Clear form to new with empty default values
-      reset(getDefaultFormValues());
-      dispatch(clearSelectedEmployee());
+      handleNewClick();
     } else if (title === "Save") {
+      // Trigger validation first
+      const isValid = await trigger();
+      if (!isValid) {
+        setSnackbar({
+          open: true,
+          message:
+            "Please fill all the required fields correctly before saving.",
+          severity: "error",
+        });
+        return;
+      }
       // Trigger form submission
       handleSubmit(onSubmit)();
     }
@@ -238,7 +265,11 @@ const EmployeeRegistration: FC = () => {
             nationalityOptions={setupOptions.nationality}
           />
 
-          <EmployeeFormTabs control={control} setupOptions={setupOptions} />
+          <EmployeeFormTabs
+            control={control}
+            setupOptions={setupOptions}
+            errors={errors}
+          />
         </>
       )}
 
@@ -257,6 +288,30 @@ const EmployeeRegistration: FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Confirmation Dialog for New button */}
+      <Dialog
+        open={showNewConfirmDialog}
+        onClose={handleCancelNew}
+        aria-labelledby="new-confirm-dialog-title"
+        aria-describedby="new-confirm-dialog-description"
+      >
+        <DialogTitle id="new-confirm-dialog-title">Clear Form?</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="new-confirm-dialog-description">
+            Are you sure you want to clear the form? All unsaved data will be
+            lost.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelNew} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmNew} color="error" autoFocus>
+            Clear Form
+          </Button>
+        </DialogActions>
+      </Dialog>
     </form>
   );
 };

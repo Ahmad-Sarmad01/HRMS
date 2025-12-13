@@ -5,7 +5,7 @@ export const employeeService = {
   async getEmployees(): Promise<Employee[]> {
     try {
       const response = await apiClient.get("/GetEmployee");
-      return response.data.getEmployee || [];
+      return response.data.employeeRegistration || [];
     } catch (error: any) {
       console.error("Error fetching employees:", error);
       const errorMessage =
