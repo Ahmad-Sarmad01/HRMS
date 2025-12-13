@@ -241,7 +241,9 @@ const EmployeeRegistration: FC = () => {
             m: 0,
           }}
         >
-          New Employee Registration
+          {selectedEmployee
+            ? "View Employee Registration"
+            : "New Employee Registration"}
         </Box>
         <EmployeeRegistrationButtons
           activeBtn={activeBtn}

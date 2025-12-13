@@ -11,7 +11,6 @@ import {
 import {
   AppointmentActionBar,
   AppointmentSearch,
-  AppointmentList,
   AppointmentFormSections,
 } from "../../component/appointment";
 import apiClient from "../../config/api";
@@ -50,7 +49,6 @@ const StaffAppointment: FC = () => {
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
   const [showSearch, setShowSearch] = useState(false);
-  const [showList, setShowList] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const { control, handleSubmit, reset } = useForm<AppointmentFormData>({
@@ -74,6 +72,15 @@ const StaffAppointment: FC = () => {
       documentsPendingDetails: "",
     },
   });
+
+  // Load appointment from slice on mount
+  useEffect(() => {
+    if (selectedAppointment) {
+      const formData = convertFromAPIFormat(selectedAppointment);
+      reset(formData);
+      setIsEditMode(true);
+    }
+  }, [selectedAppointment, reset]);
 
   // Load appointment from slice only when explicitly selected (not on mount)
   useEffect(() => {
@@ -213,7 +220,6 @@ const StaffAppointment: FC = () => {
     if (title === "New") {
       // Clear form and create new appointment
       resetForm();
-      setShowList(false);
       setShowSearch(false);
     } else if (title === "Save") {
       // Save/Update - handled by form submission
@@ -224,9 +230,6 @@ const StaffAppointment: FC = () => {
     } else if (index === 3 && title === "Search") {
       // Toggle search
       setShowSearch(!showSearch);
-    } else if (index === 4 && title === "List") {
-      // Toggle list view - just toggle, don't auto-load anything
-      setShowList(!showList);
     }
   };
 
@@ -240,31 +243,15 @@ const StaffAppointment: FC = () => {
     setActiveBtn(null);
   };
 
-  const handleSelectFromList = (appointment: any) => {
-    console.log("Selected appointment from list:", appointment);
-    const formData = convertFromAPIFormat(appointment);
-    reset(formData);
-    dispatch(setSelectedAppointment(appointment));
-    setIsEditMode(true);
-    setShowList(false);
-    setActiveBtn(null);
-  };
-
-  const handleError = (message: string) => {
-    setSnackbar({
-      open: true,
-      message,
-      severity: "error",
-    });
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <AppointmentActionBar
         activeBtn={activeBtn}
         isSubmitting={isSubmitting}
         onButtonClick={handlePillButtonClick}
-        showList={showList}
+        showList={false}
+        isEditing={isEditMode}
+        showListButton={false}
       />
 
       <AppointmentSearch
@@ -272,15 +259,7 @@ const StaffAppointment: FC = () => {
         isVisible={showSearch}
       />
 
-      {showList ? (
-        <AppointmentList
-          onSelect={handleSelectFromList}
-          onError={handleError}
-          isVisible={showList}
-        />
-      ) : (
-        <AppointmentFormSections control={control} />
-      )}
+      <AppointmentFormSections control={control} />
 
       {/* Snackbar for notifications */}
       <Snackbar

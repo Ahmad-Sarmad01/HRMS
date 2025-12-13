@@ -4,6 +4,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import EmployeeRegistration from "../pages/employee/Registration";
 import EmployeeList from "../pages/employee/EmployeeList";
 import StaffAppointment from "../pages/employee/StaffAppointment";
+import StaffAppointmentList from "../pages/employee/StaffAppointmentList";
 import DocumentRegister from "../pages/documents/DocumentRegister";
 import NewDocument from "../pages/documents/NewDocument";
 import DocumentSummary from "../pages/documents/DocumentSummary";
@@ -46,6 +47,10 @@ const AppRouter = () => {
           <Route path="/employees/new" element={<EmployeeRegistration />} />
           <Route path="/employees/list" element={<EmployeeList />} />
           <Route path="/employees/appointment" element={<StaffAppointment />} />
+          <Route
+            path="/employees/appointment-list"
+            element={<StaffAppointmentList />}
+          />
 
           {/* Document Routes */}
           <Route path="/documents/register" element={<DocumentRegister />} />

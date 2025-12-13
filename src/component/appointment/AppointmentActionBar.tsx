@@ -12,6 +12,8 @@ interface AppointmentActionBarProps {
   isSubmitting: boolean;
   onButtonClick: (index: number, title?: string) => void;
   showList?: boolean;
+  isEditing?: boolean;
+  showListButton?: boolean;
 }
 
 const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
@@ -19,6 +21,8 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
   isSubmitting,
   onButtonClick,
   showList,
+  isEditing,
+  showListButton = true,
 }) => {
   return (
     <Box sx={{ mt: 0 }}>
@@ -60,19 +64,21 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
               New
             </Box>
           </PillButton>
-          <PillButton
-            index={4}
-            onClick={() => onButtonClick(4, "List")}
-            isActive={showList}
-          >
-            <ListIcon fontSize="small" />
-            <Box
-              component="span"
-              sx={{ display: { xs: "none", sm: "inline" } }}
+          {showListButton && (
+            <PillButton
+              index={4}
+              onClick={() => onButtonClick(4, "List")}
+              isActive={showList}
             >
-              List
-            </Box>
-          </PillButton>
+              <ListIcon fontSize="small" />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                List
+              </Box>
+            </PillButton>
+          )}
           {!showList && (
             <>
               <PillButton
@@ -139,7 +145,9 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
             minWidth: 0,
           }}
         >
-          Staff Appointment Request
+          {isEditing
+            ? "View Staff Appointment Request"
+            : "Staff Appointment Request"}
         </Box>
       </Box>
     </Box>
