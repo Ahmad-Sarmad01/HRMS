@@ -180,13 +180,18 @@ export const convertToAPIFormat = (formData: Record<string, any>): any => {
       if (
         typeof value === "object" &&
         value !== null &&
-        !Array.isArray(value)
+        !Array.isArray(value) &&
+        !(value instanceof File) // Don't flatten File objects
       ) {
         flatten(value);
       } else {
         // Convert boolean values to "Yes"/"No" strings
         if (typeof value === "boolean") {
           apiData[apiKey] = value ? "Yes" : "No";
+        } else if (value instanceof File) {
+          // Handle File objects separately
+          apiData.uploadPhotoFile = value;
+          apiData[apiKey] = value.name;
         } else {
           apiData[apiKey] = value ?? "";
         }
@@ -272,5 +277,7 @@ export const getDefaultFormValues = (): Record<string, any> => {
   Object.keys(fieldNameMapping).forEach((key) => {
     defaults[key] = numericFields.includes(key) ? "0.00" : "";
   });
+  // Add file field with null default
+  defaults.uploadPhotoFile = null;
   return defaults;
 };
