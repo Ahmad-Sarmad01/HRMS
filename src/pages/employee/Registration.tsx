@@ -13,7 +13,7 @@ import {
   convertToAPIFormat,
   convertFromAPIFormat,
   fieldNameMapping,
-} from "../../utils/fieldMapping";
+} from "../../utils/employeeFieldMapping";
 import { employeeService } from "../../services/employeeService";
 import { setupService, SetupOption } from "../../services/setupService";
 

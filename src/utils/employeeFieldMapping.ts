@@ -226,7 +226,6 @@ const numericFields = [
   "basicSalary",
   "ministrySalary",
   "grossSalary",
-  "leaveSalary",
   "leavePerYear",
   "rateIncrementByPercent",
   "periodsPerWeek",
