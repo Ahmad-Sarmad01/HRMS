@@ -1,5 +1,5 @@
-import React, { FC, useState, useEffect } from "react";
-import { Box, Snackbar, Alert } from "@mui/material";
+import { FC, useState, useEffect } from "react";
+import { Snackbar, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -51,13 +51,9 @@ const StaffAppointment: FC = () => {
   }>({ open: false, message: "", severity: "success" });
   const [showSearch, setShowSearch] = useState(false);
   const [showList, setShowList] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<AppointmentFormData>({
+  const { control, handleSubmit, reset } = useForm<AppointmentFormData>({
     defaultValues: {
       refNo: "0.00",
       date: new Date().toISOString().split("T")[0],
@@ -79,13 +75,13 @@ const StaffAppointment: FC = () => {
     },
   });
 
-  // Load appointment from slice on mount
+  // Load appointment from slice only when explicitly selected (not on mount)
   useEffect(() => {
-    if (selectedAppointment) {
+    if (selectedAppointment && isEditMode) {
       const formData = convertFromAPIFormat(selectedAppointment);
       reset(formData);
     }
-  }, [selectedAppointment, reset]);
+  }, [selectedAppointment, isEditMode]);
 
   // Convert backend API data to frontend form format
   const convertFromAPIFormat = (apiData: any): AppointmentFormData => {
@@ -142,26 +138,31 @@ const StaffAppointment: FC = () => {
       const apiData = convertToAPIFormat(data);
 
       console.log("Submitting appointment data:", apiData);
+      console.log("Is Edit Mode:", isEditMode);
 
       // Use PUT if editing existing appointment, POST if creating new
-      const response = selectedAppointment
-        ? await apiClient.put("/PutEmployeeAppointment", apiData)
-        : await apiClient.post("/PostEmployeeAppointment", apiData);
+      const response =
+        isEditMode && selectedAppointment
+          ? await apiClient.put("/PutEmployeeAppointment", apiData)
+          : await apiClient.post("/PostEmployeeAppointment", apiData);
 
       if (response.data?.isSuccess) {
         setSnackbar({
           open: true,
-          message: selectedAppointment
-            ? "Staff appointment updated successfully!"
-            : "Staff appointment submitted successfully!",
+          message:
+            isEditMode && selectedAppointment
+              ? "Staff appointment updated successfully!"
+              : "Staff appointment submitted successfully!",
           severity: "success",
         });
-        reset();
-        dispatch(clearSelectedAppointment());
+        // Clear form and reset state
+        resetForm();
       } else {
         throw new Error(
           response.data?.message ||
-            `Failed to ${selectedAppointment ? "update" : "submit"} appointment`
+            `Failed to ${
+              isEditMode && selectedAppointment ? "update" : "submit"
+            } appointment`
         );
       }
     } catch (error: any) {
@@ -177,6 +178,31 @@ const StaffAppointment: FC = () => {
     }
   };
 
+  const resetForm = () => {
+    reset({
+      refNo: "0.00",
+      date: new Date().toISOString().split("T")[0],
+      staffName: "",
+      designation: "",
+      dateOfJoining: "",
+      salary: "",
+      recruitmentType: "",
+      status: "",
+      numberOfClassesPerWeek: "0.0",
+      gradeLevelsAssigned: "",
+      additionalResponsibility: "",
+      currentVisaType: "",
+      otherSpecify: "",
+      currentVisaExpiryDate: "",
+      requestedApprovalFor: "",
+      documentsReceivedConfirmed: false,
+      documentsPendingDetails: "",
+    });
+    dispatch(clearSelectedAppointment());
+    setIsEditMode(false);
+    setActiveBtn(null);
+  };
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -185,27 +211,10 @@ const StaffAppointment: FC = () => {
     setActiveBtn(index);
 
     if (title === "New") {
-      // Clear form to new with empty default values
-      reset({
-        refNo: "0.00",
-        date: new Date().toISOString().split("T")[0],
-        staffName: "",
-        designation: "",
-        dateOfJoining: "",
-        salary: "",
-        recruitmentType: "",
-        status: "",
-        numberOfClassesPerWeek: "0.0",
-        gradeLevelsAssigned: "",
-        additionalResponsibility: "",
-        currentVisaType: "",
-        otherSpecify: "",
-        currentVisaExpiryDate: "",
-        requestedApprovalFor: "",
-        documentsReceivedConfirmed: false,
-        documentsPendingDetails: "",
-      });
-      dispatch(clearSelectedAppointment());
+      // Clear form and create new appointment
+      resetForm();
+      setShowList(false);
+      setShowSearch(false);
     } else if (title === "Save") {
       // Save/Update
       handleSubmit(onSubmit)();
@@ -216,7 +225,7 @@ const StaffAppointment: FC = () => {
       // Toggle search
       setShowSearch(!showSearch);
     } else if (index === 4 && title === "List") {
-      // Toggle list view
+      // Toggle list view - just toggle, don't auto-load anything
       setShowList(!showList);
     }
   };
@@ -226,7 +235,9 @@ const StaffAppointment: FC = () => {
     const formData = convertFromAPIFormat(appointment);
     reset(formData);
     dispatch(setSelectedAppointment(appointment));
+    setIsEditMode(true);
     setShowSearch(false);
+    setActiveBtn(null);
   };
 
   const handleSelectFromList = (appointment: any) => {
@@ -234,7 +245,9 @@ const StaffAppointment: FC = () => {
     const formData = convertFromAPIFormat(appointment);
     reset(formData);
     dispatch(setSelectedAppointment(appointment));
+    setIsEditMode(true);
     setShowList(false);
+    setActiveBtn(null);
   };
 
   const handleError = (message: string) => {
@@ -254,12 +267,16 @@ const StaffAppointment: FC = () => {
         showList={showList}
       />
 
-      {showSearch && <AppointmentSearch onSelect={handleSelectAppointment} />}
+      <AppointmentSearch
+        onSelect={handleSelectAppointment}
+        isVisible={showSearch}
+      />
 
       {showList ? (
         <AppointmentList
           onSelect={handleSelectFromList}
           onError={handleError}
+          isVisible={showList}
         />
       ) : (
         <AppointmentFormSections control={control} />

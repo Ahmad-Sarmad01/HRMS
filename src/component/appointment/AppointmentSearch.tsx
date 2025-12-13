@@ -12,16 +12,29 @@ import apiClient from "../../config/api";
 
 interface AppointmentSearchProps {
   onSelect: (appointment: any) => void;
+  isVisible: boolean;
 }
 
-const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ onSelect }) => {
+const AppointmentSearch: React.FC<AppointmentSearchProps> = ({
+  onSelect,
+  isVisible,
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Reset search when visibility changes
+  useEffect(() => {
+    if (!isVisible) {
+      setSearchQuery("");
+      setSearchResults([]);
+      setIsSearching(false);
+    }
+  }, [isVisible]);
+
   // Debounced search effect
   useEffect(() => {
-    if (!searchQuery.trim()) {
+    if (!searchQuery.trim() || !isVisible) {
       setSearchResults([]);
       return;
     }
@@ -46,7 +59,11 @@ const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ onSelect }) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, isVisible]);
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <Box sx={{ mt: 2, mb: 2 }}>

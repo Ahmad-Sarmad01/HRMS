@@ -1,4 +1,4 @@
-import { Employee, EmployeeFormData } from "../types/employee";
+import { Employee } from "../types/employee";
 import apiClient from "../config/api";
 
 export const employeeService = {

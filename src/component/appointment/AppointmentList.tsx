@@ -6,14 +6,17 @@ import apiClient from "../../config/api";
 interface AppointmentListProps {
   onSelect: (appointment: any) => void;
   onError: (message: string) => void;
+  isVisible?: boolean;
 }
 
 const AppointmentList: React.FC<AppointmentListProps> = ({
   onSelect,
   onError,
+  isVisible = true,
 }) => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 10,
@@ -31,15 +34,20 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
   ];
 
   useEffect(() => {
-    fetchAllAppointments();
-  }, []);
+    if (isVisible && !hasFetched) {
+      fetchAllAppointments();
+    }
+  }, [isVisible, hasFetched]);
 
   const fetchAllAppointments = async () => {
+    if (hasFetched) return; // Prevent duplicate fetches
+
     try {
       setIsLoading(true);
       const response = await apiClient.get("/GetEmployeeAppointment");
       const data = response.data?.employeeAppointment || [];
       setAppointments(data);
+      setHasFetched(true);
       console.log("Fetched appointments:", data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
@@ -48,6 +56,10 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
       setIsLoading(false);
     }
   };
+
+  if (!isVisible) {
+    return null;
+  }
 
   if (isLoading) {
     return (

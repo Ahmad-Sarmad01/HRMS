@@ -4,6 +4,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import SendIcon from "@mui/icons-material/Send";
 import SearchIcon from "@mui/icons-material/Search";
 import ListIcon from "@mui/icons-material/List";
+import AddIcon from "@mui/icons-material/Add";
 import PillButton from "../buttons/pillButton";
 
 interface AppointmentActionBarProps {
@@ -46,6 +47,19 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
             flexShrink: 0,
           }}
         >
+          <PillButton
+            index={5}
+            onClick={() => onButtonClick(5, "New")}
+            isActive={activeBtn === 5}
+          >
+            <AddIcon fontSize="small" />
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              New
+            </Box>
+          </PillButton>
           <PillButton
             index={4}
             onClick={() => onButtonClick(4, "List")}
