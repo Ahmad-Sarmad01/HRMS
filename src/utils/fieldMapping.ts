@@ -180,21 +180,11 @@ export const convertToAPIFormat = (formData: Record<string, any>): any => {
       if (
         typeof value === "object" &&
         value !== null &&
-        !Array.isArray(value) &&
-        !(value instanceof File) // Don't flatten File objects
+        !Array.isArray(value)
       ) {
         flatten(value);
       } else {
-        // Convert boolean values to "Yes"/"No" strings
-        if (typeof value === "boolean") {
-          apiData[apiKey] = value ? "Yes" : "No";
-        } else if (value instanceof File) {
-          // Handle File objects separately
-          apiData.uploadPhotoFile = value;
-          apiData[apiKey] = value.name;
-        } else {
-          apiData[apiKey] = value ?? "";
-        }
+        apiData[apiKey] = value ?? "";
       }
     });
   };
@@ -207,9 +197,6 @@ export const convertToAPIFormat = (formData: Record<string, any>): any => {
       apiData[apiKey] = "";
     }
   }
-
-  // Add required 'request' field
-  apiData.request = "employee_registration";
 
   return apiData;
 };
@@ -225,13 +212,7 @@ export const convertFromAPIFormat = (apiData: any): Record<string, any> => {
 
   Object.entries(apiData).forEach(([key, value]) => {
     const frontendKey = reverseMapping[key] || key;
-
-    // Convert "Yes"/"No" strings back to boolean
-    if (value === "Yes" || value === "No") {
-      formData[frontendKey] = value === "Yes";
-    } else {
-      formData[frontendKey] = value ?? "";
-    }
+    formData[frontendKey] = value ?? "";
   });
 
   return formData;
@@ -245,6 +226,7 @@ const numericFields = [
   "basicSalary",
   "ministrySalary",
   "grossSalary",
+  "leaveSalary",
   "leavePerYear",
   "rateIncrementByPercent",
   "periodsPerWeek",
@@ -275,9 +257,7 @@ const numericFields = [
 export const getDefaultFormValues = (): Record<string, any> => {
   const defaults: Record<string, any> = {};
   Object.keys(fieldNameMapping).forEach((key) => {
-    defaults[key] = numericFields.includes(key) ? "0" : "";
+    defaults[key] = numericFields.includes(key) ? "0.00" : "";
   });
-  // Add file field with null default
-  defaults.uploadPhotoFile = null;
   return defaults;
 };
