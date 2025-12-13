@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # ❌ Do NOT rewrite API calls
+  RewriteCond %{REQUEST_URI} ^/mechriapi/ [NC]
+  RewriteRule ^ - [L]
+
+  # ❌ Do NOT rewrite real files/folders
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # ✅ React SPA fallback
+  RewriteRule ^ index.html [L]
+</IfModule>
