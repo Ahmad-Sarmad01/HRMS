@@ -26,12 +26,18 @@ interface EmployeeFormTabsProps {
   control: any;
   setupOptions: any;
   errors?: FieldErrors;
+  staffCode?: string;
+  companyID?: string;
+  branch?: string;
 }
 
 const EmployeeFormTabs: FC<EmployeeFormTabsProps> = ({
   control,
   setupOptions,
   errors = {},
+  staffCode,
+  companyID,
+  branch,
 }) => {
   const [tabValue, setTabValue] = useState<number>(0);
 
@@ -405,10 +411,19 @@ const EmployeeFormTabs: FC<EmployeeFormTabsProps> = ({
           <DocumentsForm control={control} />
         </Box>
         <Box sx={{ display: tabValue === 3 ? "block" : "none" }}>
-          <GeneralForm control={control} />
+          <GeneralForm
+            control={control}
+            staffCode={staffCode}
+            companyID={companyID}
+            branch={branch}
+          />
         </Box>
         <Box sx={{ display: tabValue === 4 ? "block" : "none" }}>
-          <DependantForm control={control} />
+          <DependantForm
+            control={control}
+            staffCode={staffCode}
+            companyID={companyID}
+          />
         </Box>
         <Box sx={{ display: tabValue === 5 ? "block" : "none" }}>
           <LeaveForm control={control} />
@@ -417,7 +432,11 @@ const EmployeeFormTabs: FC<EmployeeFormTabsProps> = ({
           <FinanceForm control={control} />
         </Box>
         <Box sx={{ display: tabValue === 7 ? "block" : "none" }}>
-          <PayrollForm control={control} />
+          <PayrollForm
+            control={control}
+            staffCode={staffCode}
+            companyID={companyID}
+          />
         </Box>
         <Box sx={{ display: tabValue === 8 ? "block" : "none" }}>
           <OthersForm control={control} />

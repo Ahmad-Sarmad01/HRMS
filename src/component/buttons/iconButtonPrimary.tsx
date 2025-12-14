@@ -7,6 +7,7 @@ type IconButtonPrimaryProps = {
   onClick?: ButtonProps["onClick"];
   sx?: ButtonProps["sx"];
   variant?: ButtonProps["variant"];
+  disabled?: boolean;
 };
 
 const IconButtonPrimary: React.FC<IconButtonPrimaryProps> = ({
@@ -15,12 +16,14 @@ const IconButtonPrimary: React.FC<IconButtonPrimaryProps> = ({
   onClick,
   sx,
   variant = "contained",
+  disabled = false,
 }) => {
   return (
     <Button
       variant={variant}
       onClick={onClick}
       startIcon={icon}
+      disabled={disabled}
       sx={{
         backgroundColor: "#D9C48C",
         color: "#011527",

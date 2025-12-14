@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 import { Control, FieldValues } from "react-hook-form";
+import { employeeService } from "../../services/employeeService";
 import {
   Box,
   Button,
@@ -15,6 +16,8 @@ import {
   Typography,
   FormControlLabel,
   Checkbox,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -41,11 +44,17 @@ interface DependantItem {
 interface DependantFormProps<T extends FieldValues> {
   control: Control<T>;
   disabled?: boolean;
+  staffCode?: string;
+  companyID?: string;
+  onDependantAdded?: () => void;
 }
 
 const DependantForm = <T extends FieldValues>({
   control,
   disabled = false,
+  staffCode,
+  companyID,
+  onDependantAdded,
 }: DependantFormProps<T>) => {
   // Dependant State
   const [dependantRows, setDependantRows] = useState<DependantItem[]>([]);
@@ -62,6 +71,9 @@ const DependantForm = <T extends FieldValues>({
     page: 0,
     pageSize: 5,
   });
+  const [isSubmittingDependant, setIsSubmittingDependant] = useState(false);
+  const [dependantError, setDependantError] = useState<string | null>(null);
+  const [dependantSuccess, setDependantSuccess] = useState<string | null>(null);
 
   // Dependant Columns
   const dependantColumns: GridColDef[] = [
@@ -124,21 +136,70 @@ const DependantForm = <T extends FieldValues>({
     setRemarks("");
   };
 
-  const handleDependantAdd = () => {
-    if (!name || !relationship) return;
-    const newItem: DependantItem = {
-      id: Date.now().toString(),
-      name,
-      relationship,
-      dob,
-      age,
-      maritalStatus,
-      medical,
-      status,
-      remarks,
-    };
-    setDependantRows((prev) => [newItem, ...prev]);
-    handleDependantClose();
+  const handleDependantAdd = async () => {
+    if (!name || !relationship) {
+      setDependantError("Name and Relationship are required");
+      return;
+    }
+
+    // Check if staffCode is available
+    if (!staffCode) {
+      setDependantError("Please save the employee first to add dependants");
+      return;
+    }
+
+    setIsSubmittingDependant(true);
+    setDependantError(null);
+    setDependantSuccess(null);
+
+    try {
+      // Post to API
+      await employeeService.postEmployeeDependant({
+        staff_Code: staffCode,
+        name: name,
+        relationship: relationship,
+        date_Of_Birth: dob,
+        marital_Status: maritalStatus,
+        medical: medical ? "Yes" : "No",
+        status: status,
+        remarks: remarks,
+        upload_Photo_Name: "",
+        companyID: companyID || "",
+      });
+
+      // Add to local state on success
+      const newItem: DependantItem = {
+        id: Date.now().toString(),
+        name,
+        relationship,
+        dob,
+        age,
+        maritalStatus,
+        medical,
+        status,
+        remarks,
+      };
+      setDependantRows((prev) => [newItem, ...prev]);
+      setDependantSuccess("Dependant added successfully");
+
+      // Notify parent if callback provided
+      if (onDependantAdded) {
+        onDependantAdded();
+      }
+
+      // Close dialog after a brief delay to show success message
+      setTimeout(() => {
+        handleDependantClose();
+        setDependantSuccess(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("Error adding dependant:", error);
+      setDependantError(
+        error.message || "Failed to add dependant. Please try again."
+      );
+    } finally {
+      setIsSubmittingDependant(false);
+    }
   };
 
   const handleDependantDelete = (id: string) => {
@@ -206,6 +267,21 @@ const DependantForm = <T extends FieldValues>({
       >
         <DialogTitle>Add Dependant</DialogTitle>
         <DialogContent>
+          {dependantError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {dependantError}
+            </Alert>
+          )}
+          {dependantSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {dependantSuccess}
+            </Alert>
+          )}
+          {!staffCode && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              Please save the employee first before adding dependants
+            </Alert>
+          )}
           <Box
             sx={{
               display: "flex",
@@ -294,17 +370,30 @@ const DependantForm = <T extends FieldValues>({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDependantClose}>Cancel</Button>
+          <Button
+            onClick={handleDependantClose}
+            disabled={isSubmittingDependant}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={handleDependantAdd}
             variant="contained"
+            disabled={isSubmittingDependant || !staffCode}
             sx={{
               backgroundColor: "#D9C48C",
               color: "#011527",
               textTransform: "none",
             }}
           >
-            Add
+            {isSubmittingDependant ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Adding...
+              </>
+            ) : (
+              "Add"
+            )}
           </Button>
         </DialogActions>
       </Dialog>

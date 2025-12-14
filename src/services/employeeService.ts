@@ -134,4 +134,102 @@ export const employeeService = {
       throw new Error(JSON.stringify(errorMessage));
     }
   },
+
+  async postEmployeeQualification(data: {
+    staff_Code: string;
+    action: string;
+    level: string;
+    qualification: string;
+    specialisation: string;
+    year: string;
+    duration: string;
+    mode: string;
+    university_Institution: string;
+    companyID: string;
+    branch: string;
+  }): Promise<any> {
+    try {
+      const response = await apiClient.post("/postemployeequalification", data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error posting employee qualification:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async postEmployeeExperience(data: {
+    staff_Code: string;
+    action: string;
+    company_Name: string;
+    designation: string;
+    from_Date: string;
+    to_Date: string;
+    experience: string;
+    companyID: string;
+    branch: string;
+  }): Promise<any> {
+    try {
+      const response = await apiClient.post("/postemployeeexperience", data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error posting employee experience:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async postEmployeeDependant(data: {
+    staff_Code: string;
+    name: string;
+    relationship: string;
+    date_Of_Birth: string;
+    marital_Status: string;
+    medical: string;
+    status: string;
+    remarks: string;
+    upload_Photo_Name: string;
+    companyID: string;
+  }): Promise<any> {
+    try {
+      const response = await apiClient.post("/postemployeedependant", data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error posting employee dependant:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async postEmployeeAllowance(data: {
+    staff_Code: string;
+    allowance_Type: string;
+    allowance_Amount: string;
+    companyID: string;
+  }): Promise<any> {
+    try {
+      const response = await apiClient.post("/postemployeeAllowance", data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error posting employee allowance:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
 };

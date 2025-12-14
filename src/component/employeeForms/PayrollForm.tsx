@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 import { Control, FieldValues } from "react-hook-form";
+import { employeeService } from "../../services/employeeService";
 import {
   Box,
   Button,
@@ -16,6 +17,8 @@ import {
   FormControl,
   InputLabel,
   Grid,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -37,11 +40,17 @@ interface AllowanceItem {
 interface PayrollFormProps<T extends FieldValues> {
   control: Control<T>;
   disabled?: boolean;
+  staffCode?: string;
+  companyID?: string;
+  onAllowanceAdded?: () => void;
 }
 
 const PayrollForm = <T extends FieldValues>({
   control,
   disabled = false,
+  staffCode,
+  companyID,
+  onAllowanceAdded,
 }: PayrollFormProps<T>) => {
   // Salary fields
   const salaryFields = [
@@ -157,6 +166,9 @@ const PayrollForm = <T extends FieldValues>({
     page: 0,
     pageSize: 5,
   });
+  const [isSubmittingAllowance, setIsSubmittingAllowance] = useState(false);
+  const [allowanceError, setAllowanceError] = useState<string | null>(null);
+  const [allowanceSuccess, setAllowanceSuccess] = useState<string | null>(null);
 
   // Allowance Columns
   const allowanceColumns: GridColDef[] = [
@@ -191,15 +203,58 @@ const PayrollForm = <T extends FieldValues>({
     setAllowanceAmount("");
   };
 
-  const handleAllowanceAdd = () => {
-    if (!selectedAllowance || !allowanceAmount) return;
-    const newItem: AllowanceItem = {
-      id: Date.now().toString(),
-      allowances: selectedAllowance,
-      amount: allowanceAmount,
-    };
-    setAllowanceRows((prev) => [newItem, ...prev]);
-    handleAllowanceClose();
+  const handleAllowanceAdd = async () => {
+    if (!selectedAllowance || !allowanceAmount) {
+      setAllowanceError("Allowance Type and Amount are required");
+      return;
+    }
+
+    // Check if staffCode is available
+    if (!staffCode) {
+      setAllowanceError("Please save the employee first to add allowances");
+      return;
+    }
+
+    setIsSubmittingAllowance(true);
+    setAllowanceError(null);
+    setAllowanceSuccess(null);
+
+    try {
+      // Post to API
+      await employeeService.postEmployeeAllowance({
+        staff_Code: staffCode,
+        allowance_Type: selectedAllowance,
+        allowance_Amount: allowanceAmount,
+        companyID: companyID || "",
+      });
+
+      // Add to local state on success
+      const newItem: AllowanceItem = {
+        id: Date.now().toString(),
+        allowances: selectedAllowance,
+        amount: allowanceAmount,
+      };
+      setAllowanceRows((prev) => [newItem, ...prev]);
+      setAllowanceSuccess("Allowance added successfully");
+
+      // Notify parent if callback provided
+      if (onAllowanceAdded) {
+        onAllowanceAdded();
+      }
+
+      // Close dialog after a brief delay to show success message
+      setTimeout(() => {
+        handleAllowanceClose();
+        setAllowanceSuccess(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("Error adding allowance:", error);
+      setAllowanceError(
+        error.message || "Failed to add allowance. Please try again."
+      );
+    } finally {
+      setIsSubmittingAllowance(false);
+    }
   };
 
   const handleAllowanceDelete = (id: string) => {
@@ -308,6 +363,21 @@ const PayrollForm = <T extends FieldValues>({
               >
                 Add Allowance
               </Typography>
+              {allowanceError && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {allowanceError}
+                </Alert>
+              )}
+              {allowanceSuccess && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  {allowanceSuccess}
+                </Alert>
+              )}
+              {!staffCode && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  Please save the employee first before adding allowances
+                </Alert>
+              )}
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <FormControl fullWidth>
                   <InputLabel>Select Allowance</InputLabel>
@@ -338,9 +408,18 @@ const PayrollForm = <T extends FieldValues>({
                   size="small"
                 />
                 <IconButtonPrimary
-                  icon={<AddIcon />}
-                  label="Update Allowance"
+                  icon={
+                    isSubmittingAllowance ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <AddIcon />
+                    )
+                  }
+                  label={
+                    isSubmittingAllowance ? "Adding..." : "Update Allowance"
+                  }
                   onClick={handleAllowanceAdd}
+                  disabled={isSubmittingAllowance || !staffCode}
                 />
               </Box>
             </Box>

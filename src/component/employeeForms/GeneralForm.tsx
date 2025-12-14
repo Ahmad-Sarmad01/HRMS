@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 import { Control, FieldValues } from "react-hook-form";
+import { employeeService } from "../../services/employeeService";
 import {
   Box,
   Button,
@@ -13,6 +14,8 @@ import {
   Paper,
   IconButton,
   Typography,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -47,14 +50,35 @@ interface ExperienceItem {
 interface GeneralFormProps<T extends FieldValues> {
   control: Control<T>;
   disabled?: boolean;
+  staffCode?: string;
+  companyID?: string;
+  branch?: string;
+  onQualificationAdded?: () => void;
 }
 
 const GeneralForm = <T extends FieldValues>({
   control,
   disabled = false,
+  staffCode,
+  companyID,
+  branch,
+  onQualificationAdded,
 }: GeneralFormProps<T>) => {
   const [qualificationSummary, setQualificationSummary] = useState("");
   const [internalExperience, setInternalExperience] = useState("");
+  const [isSubmittingQualification, setIsSubmittingQualification] =
+    useState(false);
+  const [qualificationError, setQualificationError] = useState<string | null>(
+    null
+  );
+  const [qualificationSuccess, setQualificationSuccess] = useState<
+    string | null
+  >(null);
+  const [isSubmittingExperience, setIsSubmittingExperience] = useState(false);
+  const [experienceError, setExperienceError] = useState<string | null>(null);
+  const [experienceSuccess, setExperienceSuccess] = useState<string | null>(
+    null
+  );
 
   // Qualification State
   const [qualificationRows, setQualificationRows] = useState<
@@ -179,20 +203,74 @@ const GeneralForm = <T extends FieldValues>({
     setUniversityInstitute("");
   };
 
-  const handleQualificationAdd = () => {
-    if (!qualification || !universityInstitute) return;
-    const newItem: QualificationItem = {
-      id: Date.now().toString(),
-      level,
-      qualification,
-      specialization,
-      year,
-      duration,
-      mode,
-      universityInstitute,
-    };
-    setQualificationRows((prev) => [newItem, ...prev]);
-    handleQualificationClose();
+  const handleQualificationAdd = async () => {
+    if (!qualification || !universityInstitute) {
+      setQualificationError(
+        "Qualification and University/Institute are required"
+      );
+      return;
+    }
+
+    // Check if staffCode is available
+    if (!staffCode) {
+      setQualificationError(
+        "Please save the employee first to add qualifications"
+      );
+      return;
+    }
+
+    setIsSubmittingQualification(true);
+    setQualificationError(null);
+    setQualificationSuccess(null);
+
+    try {
+      // Post to API
+      await employeeService.postEmployeeQualification({
+        staff_Code: staffCode,
+        action: "ADD",
+        level: level,
+        qualification: qualification,
+        specialisation: specialization,
+        year: year,
+        duration: duration,
+        mode: mode,
+        university_Institution: universityInstitute,
+        companyID: companyID || "",
+        branch: branch || "",
+      });
+
+      // Add to local state on success
+      const newItem: QualificationItem = {
+        id: Date.now().toString(),
+        level,
+        qualification,
+        specialization,
+        year,
+        duration,
+        mode,
+        universityInstitute,
+      };
+      setQualificationRows((prev) => [newItem, ...prev]);
+      setQualificationSuccess("Qualification added successfully");
+
+      // Notify parent if callback provided
+      if (onQualificationAdded) {
+        onQualificationAdded();
+      }
+
+      // Close dialog after a brief delay to show success message
+      setTimeout(() => {
+        handleQualificationClose();
+        setQualificationSuccess(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("Error adding qualification:", error);
+      setQualificationError(
+        error.message || "Failed to add qualification. Please try again."
+      );
+    } finally {
+      setIsSubmittingQualification(false);
+    }
   };
 
   const handleQualificationDelete = (id: string) => {
@@ -210,18 +288,66 @@ const GeneralForm = <T extends FieldValues>({
     setExperience("");
   };
 
-  const handleExperienceAdd = () => {
-    if (!companyName || !designation) return;
-    const newItem: ExperienceItem = {
-      id: Date.now().toString(),
-      companyName,
-      designation,
-      fromDate,
-      toDate,
-      experience,
-    };
-    setExperienceRows((prev) => [newItem, ...prev]);
-    handleExperienceClose();
+  const handleExperienceAdd = async () => {
+    if (!companyName || !designation) {
+      setExperienceError("Company Name and Designation are required");
+      return;
+    }
+
+    // Check if staffCode is available
+    if (!staffCode) {
+      setExperienceError("Please save the employee first to add experience");
+      return;
+    }
+
+    setIsSubmittingExperience(true);
+    setExperienceError(null);
+    setExperienceSuccess(null);
+
+    try {
+      // Post to API
+      await employeeService.postEmployeeExperience({
+        staff_Code: staffCode,
+        action: "ADD",
+        company_Name: companyName,
+        designation: designation,
+        from_Date: fromDate,
+        to_Date: toDate,
+        experience: experience,
+        companyID: companyID || "",
+        branch: branch || "",
+      });
+
+      // Add to local state on success
+      const newItem: ExperienceItem = {
+        id: Date.now().toString(),
+        companyName,
+        designation,
+        fromDate,
+        toDate,
+        experience,
+      };
+      setExperienceRows((prev) => [newItem, ...prev]);
+      setExperienceSuccess("Experience added successfully");
+
+      // Notify parent if callback provided
+      if (onQualificationAdded) {
+        onQualificationAdded();
+      }
+
+      // Close dialog after a brief delay to show success message
+      setTimeout(() => {
+        handleExperienceClose();
+        setExperienceSuccess(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("Error adding experience:", error);
+      setExperienceError(
+        error.message || "Failed to add experience. Please try again."
+      );
+    } finally {
+      setIsSubmittingExperience(false);
+    }
   };
 
   const handleExperienceDelete = (id: string) => {
@@ -362,6 +488,21 @@ const GeneralForm = <T extends FieldValues>({
       >
         <DialogTitle>Add Qualification</DialogTitle>
         <DialogContent>
+          {qualificationError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {qualificationError}
+            </Alert>
+          )}
+          {qualificationSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {qualificationSuccess}
+            </Alert>
+          )}
+          {!staffCode && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              Please save the employee first before adding qualifications
+            </Alert>
+          )}
           <Box
             sx={{
               display: "flex",
@@ -435,17 +576,30 @@ const GeneralForm = <T extends FieldValues>({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleQualificationClose}>Cancel</Button>
+          <Button
+            onClick={handleQualificationClose}
+            disabled={isSubmittingQualification}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={handleQualificationAdd}
             variant="contained"
+            disabled={isSubmittingQualification || !staffCode}
             sx={{
               backgroundColor: "#D9C48C",
               color: "#011527",
               textTransform: "none",
             }}
           >
-            Add
+            {isSubmittingQualification ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Adding...
+              </>
+            ) : (
+              "Add"
+            )}
           </Button>
         </DialogActions>
       </Dialog>
@@ -459,6 +613,21 @@ const GeneralForm = <T extends FieldValues>({
       >
         <DialogTitle>Add Experience</DialogTitle>
         <DialogContent>
+          {experienceError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {experienceError}
+            </Alert>
+          )}
+          {experienceSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {experienceSuccess}
+            </Alert>
+          )}
+          {!staffCode && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              Please save the employee first before adding experience
+            </Alert>
+          )}
           <Box
             sx={{
               display: "flex",
@@ -517,17 +686,30 @@ const GeneralForm = <T extends FieldValues>({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleExperienceClose}>Cancel</Button>
+          <Button
+            onClick={handleExperienceClose}
+            disabled={isSubmittingExperience}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={handleExperienceAdd}
             variant="contained"
+            disabled={isSubmittingExperience || !staffCode}
             sx={{
               backgroundColor: "#D9C48C",
               color: "#011527",
               textTransform: "none",
             }}
           >
-            Add
+            {isSubmittingExperience ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Adding...
+              </>
+            ) : (
+              "Add"
+            )}
           </Button>
         </DialogActions>
       </Dialog>

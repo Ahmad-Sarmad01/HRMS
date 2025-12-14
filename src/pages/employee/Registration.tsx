@@ -36,6 +36,9 @@ const EmployeeRegistration: FC = () => {
   const [activeBtn, setActiveBtn] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewConfirmDialog, setShowNewConfirmDialog] = useState(false);
+  const [staffCode, setStaffCode] = useState<string>("");
+  const [companyID, setCompanyID] = useState<string>("");
+  const [branch, setBranch] = useState<string>("");
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -132,6 +135,10 @@ const EmployeeRegistration: FC = () => {
     if (selectedEmployee) {
       const formData = convertFromAPIFormat(selectedEmployee);
       reset(formData);
+      // Extract staff code, company ID, and branch
+      setStaffCode(selectedEmployee.staff_Code || "");
+      setCompanyID(selectedEmployee.companyID || "");
+      setBranch(selectedEmployee.branch || "");
     }
   }, [selectedEmployee, reset]);
 
@@ -156,6 +163,13 @@ const EmployeeRegistration: FC = () => {
         );
       }
 
+      // Extract staff code, company ID, and branch from response
+      if (response.data) {
+        setStaffCode(response.data.staff_Code || apiBody.staff_Code || "");
+        setCompanyID(response.data.companyID || apiBody.companyID || "");
+        setBranch(response.data.branch || apiBody.branch || "");
+      }
+
       setSnackbar({
         open: true,
         message: selectedEmployee
@@ -164,7 +178,8 @@ const EmployeeRegistration: FC = () => {
         severity: "success",
       });
 
-      reset(getDefaultFormValues());
+      // Don't reset form after save to keep staff code available for qualifications
+      // reset(getDefaultFormValues());
 
       console.log("Response:", response);
     } catch (error: any) {
@@ -271,6 +286,9 @@ const EmployeeRegistration: FC = () => {
             control={control}
             setupOptions={setupOptions}
             errors={errors}
+            staffCode={staffCode}
+            companyID={companyID}
+            branch={branch}
           />
         </>
       )}
