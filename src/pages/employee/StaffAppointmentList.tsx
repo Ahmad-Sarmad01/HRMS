@@ -3,6 +3,10 @@ import { Box, Snackbar, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSelectedAppointment } from "../../store/slices/appointmentSlice";
+import {
+  AppointmentListActionBar,
+  AppointmentSearch,
+} from "../../component/appointment";
 import { AppointmentList } from "../../component/appointment";
 
 const StaffAppointmentList: FC = () => {
@@ -13,6 +17,8 @@ const StaffAppointmentList: FC = () => {
     message: string;
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
+  const [activeBtn, setActiveBtn] = useState<number | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
 
   const handleSelectAppointment = (appointment: any) => {
     console.log("Selected appointment:", appointment);
@@ -32,30 +38,27 @@ const StaffAppointmentList: FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handlePillButtonClick = (index: number, title?: string) => {
+    setActiveBtn(index);
+
+    if (title === "New") {
+      navigate("/employees/appointment");
+    } else if (title === "Search") {
+      setShowSearch(!showSearch);
+    }
+  };
+
   return (
     <Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: { xs: "stretch", md: "center" },
-          justifyContent: "space-between",
-          gap: 2,
-          mb: 2,
-        }}
-      >
-        <Box
-          component="h1"
-          sx={{
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-            fontWeight: 600,
-            color: "var(--primary)",
-            m: 0,
-          }}
-        >
-          Appointment Register
-        </Box>
-      </Box>
+      <AppointmentListActionBar
+        activeBtn={activeBtn}
+        onButtonClick={handlePillButtonClick}
+      />
+
+      <AppointmentSearch
+        onSelect={handleSelectAppointment}
+        isVisible={showSearch}
+      />
 
       <AppointmentList
         onSelect={handleSelectAppointment}

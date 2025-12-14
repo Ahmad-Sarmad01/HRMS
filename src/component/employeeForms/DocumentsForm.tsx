@@ -31,6 +31,7 @@ interface DocumentItem {
   issueDate: string;
   expiry: string;
   issuePlace: string;
+  file?: File;
 }
 
 interface DocumentsFormProps<T extends FieldValues> {
@@ -49,6 +50,7 @@ const DocumentsForm = <T extends FieldValues>({
   const [issueDate, setIssueDate] = useState("");
   const [expiry, setExpiry] = useState("");
   const [issuePlace, setIssuePlace] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 5,
@@ -61,6 +63,16 @@ const DocumentsForm = <T extends FieldValues>({
     { field: "issueDate", headerName: "Issue Date", flex: 1, minWidth: 120 },
     { field: "expiry", headerName: "Expiry Date", flex: 1, minWidth: 120 },
     { field: "issuePlace", headerName: "Issue Place", flex: 1, minWidth: 150 },
+    {
+      field: "fileAttached",
+      headerName: "File",
+      width: 80,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant="body2">
+          {params.row.file ? "Yes" : "No"}
+        </Typography>
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -87,6 +99,7 @@ const DocumentsForm = <T extends FieldValues>({
     setIssueDate("");
     setExpiry("");
     setIssuePlace("");
+    setFile(null);
   };
 
   const handleAdd = () => {
@@ -99,6 +112,7 @@ const DocumentsForm = <T extends FieldValues>({
       issueDate,
       expiry,
       issuePlace,
+      file: file || undefined,
     };
     setRows((prev) => [newItem, ...prev]);
     handleClose();
@@ -212,6 +226,17 @@ const DocumentsForm = <T extends FieldValues>({
               onChange={(e) => setIssuePlace(e.target.value)}
               fullWidth
             />
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <Button variant="outlined" component="label" fullWidth>
+              {file ? file.name : "Browse Document"}
+              <input
+                type="file"
+                hidden
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+              />
+            </Button>
           </Box>
         </DialogContent>
         <DialogActions>

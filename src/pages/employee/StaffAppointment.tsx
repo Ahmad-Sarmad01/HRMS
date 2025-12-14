@@ -9,7 +9,7 @@ import {
   setSelectedAppointment,
 } from "../../store/slices/appointmentSlice";
 import {
-  AppointmentActionBar,
+  AppointmentRequestActionBar,
   AppointmentSearch,
   AppointmentFormSections,
 } from "../../component/appointment";
@@ -227,6 +227,8 @@ const StaffAppointment: FC = () => {
     } else if (index === 2) {
       // Submit for Approval - handled by form submission
       // The button will trigger form submit
+    } else if (title === "List") {
+      navigate("/employees/appointment-list");
     } else if (index === 3 && title === "Search") {
       // Toggle search
       setShowSearch(!showSearch);
@@ -245,13 +247,11 @@ const StaffAppointment: FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <AppointmentActionBar
+      <AppointmentRequestActionBar
         activeBtn={activeBtn}
         isSubmitting={isSubmitting}
         onButtonClick={handlePillButtonClick}
-        showList={false}
         isEditing={isEditMode}
-        showListButton={false}
       />
 
       <AppointmentSearch
