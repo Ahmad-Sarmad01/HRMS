@@ -7,7 +7,7 @@ interface TextInputProps<T extends FieldValues> {
   control: Control<T>;
   label: string;
   placeholder?: string;
-  type?: "text" | "email";
+  type?: "text" | "email" | "number" | "password";
   required?: boolean;
   inputMode?: "text" | "numeric" | "email";
   maxLength?: number;

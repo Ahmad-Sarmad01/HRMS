@@ -91,7 +91,8 @@ const ImageInput = <T extends FieldValues>({
               if (file) {
                 const url = URL.createObjectURL(file);
                 setPreview(url);
-                onChange(file.name);
+                // Store the file object instead of just the name
+                onChange(file);
               }
             }}
           />

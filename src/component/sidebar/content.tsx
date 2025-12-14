@@ -59,6 +59,12 @@ const menuSections = [
             route: "/employees/appointment",
             key: "staff-appointment",
           },
+          {
+            title: "Appointment Register",
+            icon: <ListAltIcon />,
+            route: "/employees/appointment-list",
+            key: "staff-appointment-list",
+          },
         ],
       },
       {

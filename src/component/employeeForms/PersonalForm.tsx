@@ -19,9 +19,9 @@ const PersonalForm = <T extends FieldValues>({
       type: "text",
       required: true,
     },
-    { name: "streetName", label: "Street Name", type: "text", required: true, },
-    { name: "uaePhoneNo", label: "UAE Phone No", type: "text", required: true, },
-    { name: "area", label: "Area", type: "text", required: true, },
+    { name: "streetName", label: "Street Name", type: "text", required: true },
+    { name: "uaePhoneNo", label: "UAE Phone No", type: "text", required: true },
+    { name: "area", label: "Area", type: "text", required: true },
     {
       name: "emirates",
       label: "Emirates",
@@ -43,12 +43,13 @@ const PersonalForm = <T extends FieldValues>({
       label: "Is Approver",
       type: "checkbox",
       fieldSize: "small",
+      required: true,
     },
   ];
 
   const homeCountryAddressFields = [
-    { name: "homeAddress1", label: "Address 1", type: "text", required: true, },
-    { name: "homeAddress2", label: "Address 2", type: "text" },
+    { name: "homeAddress1", label: "Address 1", type: "text", required: true },
+    { name: "homeAddress2", label: "Address 2", type: "text", required: true },
     {
       name: "homeCountry",
       label: "Country",
@@ -79,9 +80,19 @@ const PersonalForm = <T extends FieldValues>({
     },
   ];
   const emergencyContactFields = [
-    { name: "emergencyName", label: "Name", type: "text", required: true, },
-    { name: "emergencyMobile", label: "Emergency Mobile", type: "text", required: true, },
-    { name: "emergencyAddress", label: "Address", type: "text", required: true, },
+    { name: "emergencyName", label: "Name", type: "text", required: true },
+    {
+      name: "emergencyMobile",
+      label: "Emergency Mobile",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "emergencyAddress",
+      label: "Address",
+      type: "text",
+      required: true,
+    },
     {
       name: "emergencyRelation",
       label: "Relation",
@@ -105,7 +116,12 @@ const PersonalForm = <T extends FieldValues>({
       options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
       required: true,
     },
-    { name: "placeOfBirth", label: "Place Of Birth", type: "text", required: true, },
+    {
+      name: "placeOfBirth",
+      label: "Place Of Birth",
+      type: "text",
+      required: true,
+    },
     {
       name: "countryOfBirth",
       label: "Country Of Birth",
@@ -129,8 +145,18 @@ const PersonalForm = <T extends FieldValues>({
       options: ["Basic Salary", "Gross Salary"],
       required: true,
     },
-    { name: "gratuityStartDate", label: "Gratuity Start Date", type: "date", required: true, },
-    { name: "gratuityEndDate", label: "Gratuity End Date", type: "date", required: true, },
+    {
+      name: "gratuityStartDate",
+      label: "Gratuity Start Date",
+      type: "date",
+      required: true,
+    },
+    {
+      name: "gratuityEndDate",
+      label: "Gratuity End Date",
+      type: "date",
+      required: true,
+    },
     {
       name: "leaveSalaryAs",
       label: "Leave Salary As",

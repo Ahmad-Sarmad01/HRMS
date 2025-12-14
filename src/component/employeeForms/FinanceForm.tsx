@@ -109,14 +109,14 @@ const FinanceForm = <T extends FieldValues>({
       label: "Financial Remarks",
       type: "text",
       fieldSize: "large",
-      required: false,
+      required: true,
     },
     {
       name: "excludeFromPayroll",
       label: "Exclude From Payroll",
       type: "checkbox",
       fieldSize: "normal",
-      required: false,
+      required: true,
     },
   ];
 

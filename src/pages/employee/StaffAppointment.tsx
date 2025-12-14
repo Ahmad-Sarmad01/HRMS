@@ -1,246 +1,282 @@
-import React, { FC, useState } from "react";
-import { Box } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SendIcon from "@mui/icons-material/Send";
-import FormGrid from "../../component/formFields/FormGrid";
+import { FC, useState, useEffect } from "react";
+import { Snackbar, Alert } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/store";
+import {
+  clearSelectedAppointment,
+  setSelectedAppointment,
+} from "../../store/slices/appointmentSlice";
+import {
+  AppointmentActionBar,
+  AppointmentSearch,
+  AppointmentFormSections,
+} from "../../component/appointment";
+import apiClient from "../../config/api";
+
+interface AppointmentFormData {
+  refNo: string;
+  date: string;
+  staffName: string;
+  designation: string;
+  dateOfJoining: string;
+  salary: string;
+  recruitmentType: string;
+  status: string;
+  numberOfClassesPerWeek: string;
+  gradeLevelsAssigned: string;
+  additionalResponsibility: string;
+  currentVisaType: string;
+  otherSpecify: string;
+  currentVisaExpiryDate: string;
+  requestedApprovalFor: string;
+  documentsReceivedConfirmed: boolean;
+  documentsPendingDetails: string;
+}
 
 const StaffAppointment: FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { selectedAppointment } = useSelector(
+    (state: RootState) => state.appointment
+  );
   const [activeBtn, setActiveBtn] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
+  const [showSearch, setShowSearch] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const basicInformationFields = [
-    { name: "refNo", label: "Ref No", type: "text", fieldSize: "small" },
-    { name: "date", label: "Date", type: "date", fieldSize: "small" },
-    {
-      name: "staffName",
-      label: "Staff Name",
-      type: "text",
-      required: true,
-      fieldSize: "large",
+  const { control, handleSubmit, reset } = useForm<AppointmentFormData>({
+    defaultValues: {
+      refNo: "0.00",
+      date: new Date().toISOString().split("T")[0],
+      staffName: "",
+      designation: "",
+      dateOfJoining: "",
+      salary: "",
+      recruitmentType: "",
+      status: "",
+      numberOfClassesPerWeek: "0.0",
+      gradeLevelsAssigned: "",
+      additionalResponsibility: "",
+      currentVisaType: "",
+      otherSpecify: "",
+      currentVisaExpiryDate: "",
+      requestedApprovalFor: "",
+      documentsReceivedConfirmed: false,
+      documentsPendingDetails: "",
     },
-    { name: "designation", label: "Designation", type: "text", required: true },
-    {
-      name: "dateOfJoining",
-      label: "Date of Joining",
-      type: "date",
-    },
-    { name: "salary", label: "Salary", type: "text" },
-    {
-      name: "recruitmentType",
-      label: "Recruitment Type",
-      type: "select",
-      required: true,
-      options: ["New Hire", "Internal Transfer", "Contract", "Permanent"],
-    },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      options: ["Active", "Pending", "On Hold", "Approved", "Rejected"],
-    },
-  ];
+  });
 
-  const newAppointmentDetailsFields = [
-    {
-      name: "numberOfClassesPerWeek",
-      label: "Number of Classes Per Week",
-      type: "text",
-    },
-    {
-      name: "gradeLevelsAssigned",
-      label: "Grade Levels Assigned",
-      type: "text",
-    },
-    {
-      name: "additionalResponsibility",
-      label: "Additional Responsibility",
-      type: "text",
-      fieldSize: "large",
-    },
-  ];
+  // Load appointment from slice on mount
+  useEffect(() => {
+    if (selectedAppointment) {
+      const formData = convertFromAPIFormat(selectedAppointment);
+      reset(formData);
+      setIsEditMode(true);
+    }
+  }, [selectedAppointment, reset]);
 
-  const visaConfirmationFields = [
-    {
-      name: "currentVisaType",
-      label: "Current Visa Type",
-      type: "select",
-      options: ["Employment Visa", "Visit Visa", "Residence Visa", "Other"],
-    },
-    { name: "otherSpecify", label: "Other (Specify)", type: "text" },
-    {
-      name: "currentVisaExpiryDate",
-      label: "Current Visa Expiry Date",
-      type: "date",
-    },
-    {
-      name: "requestedApprovalFor",
-      label: "Requested Approval For",
-      type: "select",
-      options: [
-        "New Visa",
-        "Visa Renewal",
-        "Visa Transfer",
-        "Visa Cancellation",
-      ],
-    },
-  ];
+  // Load appointment from slice only when explicitly selected (not on mount)
+  useEffect(() => {
+    if (selectedAppointment && isEditMode) {
+      const formData = convertFromAPIFormat(selectedAppointment);
+      reset(formData);
+    }
+  }, [selectedAppointment, isEditMode]);
 
-  const documentDeclarationFields = [
-    {
-      name: "documentsReceivedConfirmed",
-      label:
-        "I, the undersigned HR Officer, confirm that all required documents have been received from the Candidate as per MOL/MOE/KHDA requirements.",
-      type: "checkbox",
-      fieldSize: "large",
-    },
-    {
-      name: "documentsPendingDetails",
-      label: "If any documents are pending, please specify here:",
-      type: "text",
-      placeholder: "Enter details of pending documents...",
-    },
-  ];
+  // Convert backend API data to frontend form format
+  const convertFromAPIFormat = (apiData: any): AppointmentFormData => {
+    return {
+      refNo: apiData.reference_No || "",
+      date: apiData.appointment_Date || new Date().toISOString().split("T")[0],
+      staffName: apiData.staff_Name || "",
+      designation: apiData.designation || "",
+      dateOfJoining: apiData.date_of_Joining || "",
+      salary: apiData.salary || "",
+      recruitmentType: apiData.recruitment_Type || "",
+      status: apiData.appointment_Status || "",
+      numberOfClassesPerWeek: apiData.number_of_Classes_Per_Week || "",
+      gradeLevelsAssigned: apiData.grade_Level_Assigned || "",
+      additionalResponsibility: apiData.additional_Responsibilities || "",
+      currentVisaType: apiData.current_Visa_Type || "",
+      otherSpecify: apiData.other_Visa || "",
+      currentVisaExpiryDate: apiData.visa_Expiry_Date || "",
+      requestedApprovalFor: apiData.requested_Approval_For || "",
+      documentsReceivedConfirmed: apiData.document_Declaration_Option === "Yes",
+      documentsPendingDetails: apiData.pending_Document || "",
+    };
+  };
 
-  const PillButton = ({
-    children,
-    index,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    index: number;
-    onClick: (i: number) => void;
-  }) => {
-    const isActive = index === activeBtn;
+  // Convert frontend form data to backend API format
+  const convertToAPIFormat = (data: AppointmentFormData) => {
+    return {
+      reference_No: data.refNo || "",
+      appointment_Date: data.date || "",
+      staff_Name: data.staffName || "",
+      designation: data.designation || "",
+      date_of_Joining: data.dateOfJoining || "",
+      salary: data.salary || "0",
+      recruitment_Type: data.recruitmentType || "",
+      appointment_Status: data.status || "",
+      number_of_Classes_Per_Week: data.numberOfClassesPerWeek || "",
+      grade_Level_Assigned: data.gradeLevelsAssigned || "",
+      additional_Responsibilities: data.additionalResponsibility || "",
+      current_Visa_Type: data.currentVisaType || "",
+      other_Visa: data.otherSpecify || "",
+      visa_Expiry_Date: data.currentVisaExpiryDate || "",
+      requested_Approval_For: data.requestedApprovalFor || "",
+      document_Declaration_Option: data.documentsReceivedConfirmed
+        ? "Yes"
+        : "No",
+      pending_Document: data.documentsPendingDetails || "",
+      companyID: "1", // You may want to get this from user context or store
+    };
+  };
 
-    return (
-      <Box
-        component="button"
-        onClick={() => onClick(index)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 0.5,
-          px: { xs: 1, sm: 2 },
-          py: { xs: 0.25, sm: 0.5 },
-          borderRadius: "12px",
-          border: "1px solid var(--primary)",
-          color: isActive ? "var(--text-light)" : "var(--primary)",
-          bgcolor: isActive ? "var(--primary)" : "transparent",
-          fontWeight: 600,
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          boxShadow: isActive
-            ? "0 4px 8px rgba(0,0,0,0.2)"
-            : "0 2px 4px rgba(0,0,0,0.1)",
-          fontSize: { xs: "0.75rem", sm: "0.95rem" },
-          "&:hover": isActive
-            ? { transform: "translateY(-2px)" }
-            : {
-                bgcolor: "var(--primary)",
-                color: "var(--text-light)",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                transform: "translateY(-2px)",
-              },
-        }}
-      >
-        {React.Children.map(children, (child) => {
-          if (typeof child === "string" || typeof child === "number") {
-            return (
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {child}
-              </Box>
-            );
-          }
-          return child;
-        })}
-      </Box>
-    );
+  const onSubmit = async (data: AppointmentFormData) => {
+    try {
+      setIsSubmitting(true);
+      const apiData = convertToAPIFormat(data);
+
+      console.log("Submitting appointment data:", apiData);
+      console.log("Is Edit Mode:", isEditMode);
+
+      // Use PUT if editing existing appointment, POST if creating new
+      const response =
+        isEditMode && selectedAppointment
+          ? await apiClient.put("/PutEmployeeAppointment", apiData)
+          : await apiClient.post("/PostEmployeeAppointment", apiData);
+
+      if (response.data?.isSuccess) {
+        setSnackbar({
+          open: true,
+          message:
+            isEditMode && selectedAppointment
+              ? "Staff appointment updated successfully!"
+              : "Staff appointment submitted successfully!",
+          severity: "success",
+        });
+        // Clear form and reset state
+        resetForm();
+      } else {
+        throw new Error(
+          response.data?.message ||
+            `Failed to ${
+              isEditMode && selectedAppointment ? "update" : "submit"
+            } appointment`
+        );
+      }
+    } catch (error: any) {
+      console.error("Error submitting appointment:", error);
+      setSnackbar({
+        open: true,
+        message:
+          error.message || "Failed to submit appointment. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    reset({
+      refNo: "0.00",
+      date: new Date().toISOString().split("T")[0],
+      staffName: "",
+      designation: "",
+      dateOfJoining: "",
+      salary: "",
+      recruitmentType: "",
+      status: "",
+      numberOfClassesPerWeek: "0.0",
+      gradeLevelsAssigned: "",
+      additionalResponsibility: "",
+      currentVisaType: "",
+      otherSpecify: "",
+      currentVisaExpiryDate: "",
+      requestedApprovalFor: "",
+      documentsReceivedConfirmed: false,
+      documentsPendingDetails: "",
+    });
+    dispatch(clearSelectedAppointment());
+    setIsEditMode(false);
+    setActiveBtn(null);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handlePillButtonClick = (index: number, title?: string) => {
+    setActiveBtn(index);
+
+    if (title === "New") {
+      // Clear form and create new appointment
+      resetForm();
+      setShowSearch(false);
+    } else if (title === "Save") {
+      // Save/Update - handled by form submission
+      // The button will trigger form submit
+    } else if (index === 2) {
+      // Submit for Approval - handled by form submission
+      // The button will trigger form submit
+    } else if (index === 3 && title === "Search") {
+      // Toggle search
+      setShowSearch(!showSearch);
+    }
+  };
+
+  const handleSelectAppointment = (appointment: any) => {
+    console.log("Selected appointment:", appointment);
+    const formData = convertFromAPIFormat(appointment);
+    reset(formData);
+    dispatch(setSelectedAppointment(appointment));
+    setIsEditMode(true);
+    setShowSearch(false);
+    setActiveBtn(null);
   };
 
   return (
-    <>
-      <Box sx={{ mt: 0 }}>
-        <Box
-          gap={1}
-          height={{ xs: "auto", sm: 40 }}
-          boxShadow="0 2px 6px rgba(0,0,0,0.05)"
-          borderRadius={2}
-          p={{ xs: 0.5, sm: 1 }}
-          border="1px solid var(--primary)"
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{
-            overflowX: "auto",
-            scrollbarWidth: "none",
-            "&::-webkit-scrollbar": { display: "none" },
-          }}
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <AppointmentActionBar
+        activeBtn={activeBtn}
+        isSubmitting={isSubmitting}
+        onButtonClick={handlePillButtonClick}
+        showList={false}
+        isEditing={isEditMode}
+        showListButton={false}
+      />
+
+      <AppointmentSearch
+        onSelect={handleSelectAppointment}
+        isVisible={showSearch}
+      />
+
+      <AppointmentFormSections control={control} />
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              gap: { xs: 0.5, sm: 1 },
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            <PillButton index={0} onClick={(index) => setActiveBtn(index)}>
-              <SaveIcon fontSize="small" />
-              Save
-            </PillButton>
-            <PillButton index={1} onClick={(index) => setActiveBtn(index)}>
-              <ArrowBackIcon fontSize="small" />
-              Back
-            </PillButton>
-            <PillButton index={2} onClick={(index) => setActiveBtn(index)}>
-              <SendIcon fontSize="small" />
-              Submit for Approval
-            </PillButton>
-          </Box>
-
-          <Box
-            sx={{
-              fontWeight: 600,
-              fontSize: { xs: "1rem", sm: "1.1rem" },
-              color: "var(--primary)",
-              pr: 1,
-            }}
-          >
-            Staff Appointment Request
-          </Box>
-        </Box>
-      </Box>
-
-      {/* Form Sections */}
-      <Box sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 3 }}>
-        <FormGrid
-          fields={basicInformationFields}
-          label="Basic Information"
-          columns={4}
-        />
-
-        <FormGrid
-          fields={newAppointmentDetailsFields}
-          label="New Appointment Details"
-          columns={4}
-        />
-
-        <FormGrid
-          fields={visaConfirmationFields}
-          label="Visa Confirmation"
-          columns={4}
-        />
-
-        <FormGrid
-          fields={documentDeclarationFields}
-          label="Document Declaration"
-          columns={2}
-        />
-      </Box>
-    </>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </form>
   );
 };
 

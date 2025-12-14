@@ -43,15 +43,20 @@ const OfficialForm = <T extends FieldValues>({
   };
 
   const fields = [
-    { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
-    { name: "age", label: "Age", type: "text" },
+    {
+      name: "dateOfBirth",
+      label: "Date of Birth",
+      type: "date",
+      required: true,
+    },
+    { name: "age", label: "Age", type: "text", required: true },
     {
       name: "gender",
       label: "Gender",
       type: "select",
       options: formatOptions(genderOptions),
-      required: true,
     },
+
     {
       name: "visaType",
       label: "Visa Type",
@@ -64,7 +69,6 @@ const OfficialForm = <T extends FieldValues>({
       label: "Section",
       type: "select",
       options: formatOptions(sectionOptions),
-      required: true,
     },
     {
       name: "visaSponsor",
@@ -79,7 +83,6 @@ const OfficialForm = <T extends FieldValues>({
       label: "Employment Type",
       type: "select",
       options: formatOptions(employmentTypeOptions),
-      required: true,  
     },
     {
       name: "lineManager1",
@@ -94,8 +97,18 @@ const OfficialForm = <T extends FieldValues>({
       options: formatOptions(lineManagerOptions),
     },
 
-    { name: "probationDays", label: "Probation Days", type: "text", required: true, },
-    { name: "probationEndDate", label: "Probation End Date", type: "date", required: true, },
+    {
+      name: "probationDays",
+      label: "Probation Days",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "probationEndDate",
+      label: "Probation End Date",
+      type: "date",
+      required: true,
+    },
     {
       name: "visaDesignation",
       label: "Visa Designation",
@@ -104,9 +117,24 @@ const OfficialForm = <T extends FieldValues>({
       required: true,
     },
 
-    { name: "resignationDate", label: "Resignation Date", type: "date", required: true, },
-    { name: "noticePeriod", label: "Notice Period", type: "text", required: true, },
-    { name: "lastWorkingDate", label: "Last Working Date", type: "date", required: true, },
+    {
+      name: "resignationDate",
+      label: "Resignation Date",
+      type: "date",
+      required: true,
+    },
+    {
+      name: "noticePeriod",
+      label: "Notice Period",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "lastWorkingDate",
+      label: "Last Working Date",
+      type: "date",
+      required: true,
+    },
 
     {
       name: "adekStatus",
@@ -122,17 +150,28 @@ const OfficialForm = <T extends FieldValues>({
       options: ["Primary", "Secondary", "Other"],
       required: true,
     },
-    { name: "currentGrade", label: "Current Grade", type: "text", required: true, },
+    { name: "currentGrade", label: "Current Grade", type: "text" },
 
-    { name: "contractExpiryDate", label: "Contract Expiry Date", type: "date", required: true, },
-    { name: "modifiedBy", label: "Modified By", type: "text", required: true, },
-    { name: "modifiedDate", label: "Modified Date", type: "date", required: true, },
+    {
+      name: "contractExpiryDate",
+      label: "Contract Expiry Date",
+      type: "date",
+      required: true,
+    },
+    { name: "modifiedBy", label: "Modified By", type: "text", required: true },
+    {
+      name: "modifiedDate",
+      label: "Modified Date",
+      type: "date",
+      required: true,
+    },
 
     {
       name: "labourCardStatus",
       label: "Labour Card Status",
       type: "select",
       options: formatOptions(labourCardStatusOptions),
+      required: true,
     },
     { name: "speciality", label: "Speciality", type: "text" },
     {
@@ -140,7 +179,6 @@ const OfficialForm = <T extends FieldValues>({
       label: "Position",
       type: "select",
       options: formatOptions(positionOptions),
-      required: true,
     },
 
     {
@@ -149,23 +187,33 @@ const OfficialForm = <T extends FieldValues>({
       type: "select",
       options: formatOptions(addResponsibilityOptions),
     },
-    { name: "rfid", label: "RFID", type: "text", required: true, },
+    { name: "rfid", label: "RFID", type: "text", required: true },
     {
       name: "religion",
       label: "Religion",
       type: "select",
       options: formatOptions(religionOptions),
-      required: true,
     },
 
-    { name: "emiratesIdNo", label: "Emirates ID No", type: "text", required: true, },
+    {
+      name: "emiratesIdNo",
+      label: "Emirates ID No",
+      type: "text",
+      required: true,
+    },
     {
       name: "emiratesIdExpiryDate",
       label: "Emirates ID Expiry Date",
       type: "date",
       required: true,
     },
-    { name: "moeRegistrationNo", label: "MOE Registration No", type: "text", required: true, },
+    {
+      name: "moeRegistrationNo",
+      label: "MOE Registration No",
+      type: "text",
+      required: true,
+    },
+
     {
       name: "approvedFor",
       label: "Approved For",
@@ -179,13 +227,28 @@ const OfficialForm = <T extends FieldValues>({
       options: ["Valid", "Expired", "Not Required"],
       required: true,
     },
-    { name: "tlsExpiryDate", label: "TLS Expiry Date", type: "date", required: true, },
+    {
+      name: "tlsExpiryDate",
+      label: "TLS Expiry Date",
+      type: "date",
+      required: true,
+    },
 
-    { name: "seniorityNo", label: "Seniority No", type: "text", required: true, },
-    { name: "actualJoiningDate", label: "Actual Joining Date", type: "date", required: true, },
+    {
+      name: "seniorityNo",
+      label: "Seniority No",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "actualJoiningDate",
+      label: "Actual Joining Date",
+      type: "date",
+      required: true,
+    },
     { name: "remarks", label: "Remarks", type: "text" },
 
-    { name: "signature", label: "Signature", type: "file", required: true, },
+    { name: "signature", label: "Signature", type: "file" },
   ];
 
   return <FormGrid fields={fields} control={control} disabled={disabled} />;

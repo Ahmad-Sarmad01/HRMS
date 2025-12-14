@@ -6,6 +6,7 @@ interface PillButtonProps {
   index: number;
   onClick: (index: number) => void;
   isActive?: boolean;
+  type?: "button" | "submit" | "reset";
 }
 
 const PillButton: React.FC<PillButtonProps> = ({
@@ -13,10 +14,12 @@ const PillButton: React.FC<PillButtonProps> = ({
   index,
   onClick,
   isActive = false,
+  type = "button",
 }) => {
   return (
     <Box
       component="button"
+      type={type}
       onClick={() => onClick(index)}
       sx={{
         display: "flex",
