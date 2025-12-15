@@ -2,6 +2,45 @@ import { Employee } from "../types/employee";
 import apiClient from "../config/api";
 import axios from "axios";
 
+export interface LeaveType {
+  id: string;
+  name: string;
+}
+
+export interface EmployeeLeave {
+  staff_Code: string;
+  from_Date: string;
+  to_Date: string;
+  leave_Type: string;
+  duration: string;
+  effective_Days: string;
+  status: string;
+  companyID: string;
+}
+
+export interface PostEmployeeLeaveRequest {
+  staff_Code: string;
+  from_Date: string;
+  to_Date: string;
+  leave_Type: string;
+  duration: string;
+  effective_Days: string;
+  status: string;
+  companyID: string;
+}
+
+export interface GetEmployeeLeaveResponse {
+  isSuccess: boolean;
+  message: string;
+  employeeLeave: EmployeeLeave[];
+}
+
+export interface GetLeaveTypeResponse {
+  isSuccess: boolean;
+  message: string;
+  getSetupLeaveType: LeaveType[];
+}
+
 export const employeeService = {
   async getEmployees(): Promise<Employee[]> {
     try {
@@ -146,13 +185,29 @@ export const employeeService = {
     mode: string;
     university_Institution: string;
     companyID: string;
-    branch: string;
   }): Promise<any> {
     try {
-      const response = await apiClient.post("/postemployeequalification", data);
+      const response = await apiClient.post("/PostEmployeeQualification", data);
       return response.data;
     } catch (error: any) {
       console.error("Error posting employee qualification:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async getEmployeeQualifications(search: string): Promise<any> {
+    try {
+      const response = await apiClient.get(
+        `/GetEmployeeQualification_search?search=${encodeURIComponent(search)}`
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching employee qualifications:", error);
       const errorMessage =
         error.response?.data?.errors ||
         error.response?.data ||
@@ -171,13 +226,29 @@ export const employeeService = {
     to_Date: string;
     experience: string;
     companyID: string;
-    branch: string;
   }): Promise<any> {
     try {
-      const response = await apiClient.post("/postemployeeexperience", data);
+      const response = await apiClient.post("/PostEmployeeExperience", data);
       return response.data;
     } catch (error: any) {
       console.error("Error posting employee experience:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async getEmployeeExperiences(search: string): Promise<any> {
+    try {
+      const response = await apiClient.get(
+        `/GetEmployeeExperience_search?search=${encodeURIComponent(search)}`
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching employee experiences:", error);
       const errorMessage =
         error.response?.data?.errors ||
         error.response?.data ||
@@ -200,10 +271,27 @@ export const employeeService = {
     companyID: string;
   }): Promise<any> {
     try {
-      const response = await apiClient.post("/postemployeedependant", data);
+      const response = await apiClient.post("/PostEmployeeDependant", data);
       return response.data;
     } catch (error: any) {
       console.error("Error posting employee dependant:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async getEmployeeDependants(search: string): Promise<any> {
+    try {
+      const response = await apiClient.get(
+        `/GetEmployeeDependant_search?search=${encodeURIComponent(search)}`
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching employee dependants:", error);
       const errorMessage =
         error.response?.data?.errors ||
         error.response?.data ||
@@ -220,7 +308,7 @@ export const employeeService = {
     companyID: string;
   }): Promise<any> {
     try {
-      const response = await apiClient.post("/postemployeeAllowance", data);
+      const response = await apiClient.post("/PostEmployeeAllowance", data);
       return response.data;
     } catch (error: any) {
       console.error("Error posting employee allowance:", error);
@@ -229,6 +317,75 @@ export const employeeService = {
         error.response?.data ||
         error.message ||
         "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  async getEmployeeAllowances(search: string): Promise<any> {
+    try {
+      const response = await apiClient.get(
+        `/GetEmployeeAllowance_search?search=${encodeURIComponent(search)}`
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching employee allowances:", error);
+      const errorMessage =
+        error.response?.data?.errors ||
+        error.response?.data ||
+        error.message ||
+        "Unknown error";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  // Post Employee Leave
+  async postEmployeeLeave(data: PostEmployeeLeaveRequest): Promise<any> {
+    try {
+      const response = await apiClient.post("/PostEmployeeLeave", data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error posting employee leave:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        "Failed to post employee leave";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  // Get Employee Leave by search
+  async getEmployeeLeave(
+    search: string = ""
+  ): Promise<GetEmployeeLeaveResponse> {
+    try {
+      const response = await apiClient.get(
+        `/GetEmployeeLeave_search?search=${search}`
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching employee leave:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        "Failed to fetch employee leave";
+      throw new Error(JSON.stringify(errorMessage));
+    }
+  },
+
+  // Get Leave Types
+  async getLeaveTypes(): Promise<GetLeaveTypeResponse> {
+    try {
+      const response = await apiClient.get("/GetSetupLeaveType");
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching leave types:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        "Failed to fetch leave types";
       throw new Error(JSON.stringify(errorMessage));
     }
   },

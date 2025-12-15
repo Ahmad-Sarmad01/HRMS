@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Control, FieldValues } from "react-hook-form";
 import { employeeService } from "../../services/employeeService";
 import {
@@ -79,6 +79,81 @@ const GeneralForm = <T extends FieldValues>({
   const [experienceSuccess, setExperienceSuccess] = useState<string | null>(
     null
   );
+  const [isLoadingQualifications, setIsLoadingQualifications] = useState(false);
+  const [isLoadingExperiences, setIsLoadingExperiences] = useState(false);
+
+  // Fetch qualifications and experiences when staffCode is available
+  useEffect(() => {
+    if (staffCode) {
+      fetchQualifications();
+      fetchExperiences();
+    }
+  }, [staffCode]);
+
+  const fetchQualifications = async () => {
+    if (!staffCode) return;
+
+    setIsLoadingQualifications(true);
+    try {
+      const response = await employeeService.getEmployeeQualifications(
+        staffCode
+      );
+      if (response.isSuccess && response.employeeQualification) {
+        const mappedQualifications: QualificationItem[] =
+          response.employeeQualification.map((item: any, index: number) => ({
+            id: `${staffCode}_${index}`, // Unique id
+            level: item.level || "",
+            qualification: item.qualification || "",
+            specialization: item.specialisation || "", // Note: API has 'specialisation'
+            year: item.year || "",
+            duration: item.duration || "",
+            mode: item.mode || "",
+            universityInstitute: item.university_Institution || "", // Note: API has 'university_Institution'
+          }));
+        setQualificationRows(mappedQualifications);
+      }
+    } catch (error: any) {
+      console.error("Error fetching qualifications:", error);
+      // Optionally set an error state
+    } finally {
+      setIsLoadingQualifications(false);
+    }
+  };
+
+  const fetchExperiences = async () => {
+    if (!staffCode) return;
+
+    setIsLoadingExperiences(true);
+    try {
+      const response = await employeeService.getEmployeeExperiences(staffCode);
+      if (response.isSuccess && response.employeeExperience) {
+        const mappedExperiences: ExperienceItem[] =
+          response.employeeExperience.map((item: any, index: number) => ({
+            id: `${staffCode}_exp_${index}`, // Unique id
+            companyName: item.company_Name || "",
+            designation: item.designation || "",
+            fromDate: formatDateForInput(item.from_Date),
+            toDate: formatDateForInput(item.to_Date),
+            experience: item.experience || "",
+          }));
+        setExperienceRows(mappedExperiences);
+      }
+    } catch (error: any) {
+      console.error("Error fetching experiences:", error);
+      // Optionally set an error state
+    } finally {
+      setIsLoadingExperiences(false);
+    }
+  };
+
+  // Helper function to format API date to YYYY-MM-DD
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return "";
+    // API returns "11/11/2022 12:00:00 AM"
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+  };
 
   // Qualification State
   const [qualificationRows, setQualificationRows] = useState<
@@ -236,7 +311,6 @@ const GeneralForm = <T extends FieldValues>({
         mode: mode,
         university_Institution: universityInstitute,
         companyID: companyID || "",
-        branch: branch || "",
       });
 
       // Add to local state on success
@@ -315,7 +389,6 @@ const GeneralForm = <T extends FieldValues>({
         to_Date: toDate,
         experience: experience,
         companyID: companyID || "",
-        branch: branch || "",
       });
 
       // Add to local state on success

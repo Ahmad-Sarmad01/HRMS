@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Control, FieldValues } from "react-hook-form";
 import { employeeService } from "../../services/employeeService";
 import {
@@ -169,6 +169,37 @@ const PayrollForm = <T extends FieldValues>({
   const [isSubmittingAllowance, setIsSubmittingAllowance] = useState(false);
   const [allowanceError, setAllowanceError] = useState<string | null>(null);
   const [allowanceSuccess, setAllowanceSuccess] = useState<string | null>(null);
+  const [isLoadingAllowances, setIsLoadingAllowances] = useState(false);
+
+  // Fetch allowances when staffCode is available
+  useEffect(() => {
+    if (staffCode) {
+      fetchAllowances();
+    }
+  }, [staffCode]);
+
+  const fetchAllowances = async () => {
+    if (!staffCode) return;
+
+    setIsLoadingAllowances(true);
+    try {
+      const response = await employeeService.getEmployeeAllowances(staffCode);
+      if (response.isSuccess && response.employeeAllowance) {
+        const mappedAllowances: AllowanceItem[] =
+          response.employeeAllowance.map((item: any, index: number) => ({
+            id: `${staffCode}_allow_${index}`, // Unique id
+            allowances: item.allowance_Type || "",
+            amount: item.allowance_Amount || "",
+          }));
+        setAllowanceRows(mappedAllowances);
+      }
+    } catch (error: any) {
+      console.error("Error fetching allowances:", error);
+      // Optionally set an error state
+    } finally {
+      setIsLoadingAllowances(false);
+    }
+  };
 
   // Allowance Columns
   const allowanceColumns: GridColDef[] = [

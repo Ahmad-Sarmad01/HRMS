@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Control, FieldValues } from "react-hook-form";
 import { employeeService } from "../../services/employeeService";
 import {
@@ -74,6 +74,69 @@ const DependantForm = <T extends FieldValues>({
   const [isSubmittingDependant, setIsSubmittingDependant] = useState(false);
   const [dependantError, setDependantError] = useState<string | null>(null);
   const [dependantSuccess, setDependantSuccess] = useState<string | null>(null);
+  const [isLoadingDependants, setIsLoadingDependants] = useState(false);
+
+  // Fetch dependants when staffCode is available
+  useEffect(() => {
+    if (staffCode) {
+      fetchDependants();
+    }
+  }, [staffCode]);
+
+  const fetchDependants = async () => {
+    if (!staffCode) return;
+
+    setIsLoadingDependants(true);
+    try {
+      const response = await employeeService.getEmployeeDependants(staffCode);
+      if (response.isSuccess && response.employeeDependant) {
+        const mappedDependants: DependantItem[] =
+          response.employeeDependant.map((item: any, index: number) => ({
+            id: `${staffCode}_dep_${index}`, // Unique id
+            name: item.name || "",
+            relationship: item.relationship || "",
+            dob: formatDateForInput(item.date_Of_Birth),
+            age: calculateAge(item.date_Of_Birth) || "",
+            maritalStatus: item.marital_Status || "",
+            medical: item.medical === "Yes",
+            status: item.status || "",
+            remarks: item.remarks || "",
+          }));
+        setDependantRows(mappedDependants);
+      }
+    } catch (error: any) {
+      console.error("Error fetching dependants:", error);
+      // Optionally set an error state
+    } finally {
+      setIsLoadingDependants(false);
+    }
+  };
+
+  // Helper function to format API date to YYYY-MM-DD
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return "";
+    // API returns "12/14/2025 12:00:00 AM"
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+  };
+
+  // Helper function to calculate age from date of birth
+  const calculateAge = (dateString: string): string => {
+    if (!dateString) return "";
+    const birthDate = new Date(dateString);
+    if (isNaN(birthDate.getTime())) return "";
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age.toString();
+  };
 
   // Dependant Columns
   const dependantColumns: GridColDef[] = [

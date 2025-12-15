@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Control, FieldValues } from "react-hook-form";
 import {
   Box,
@@ -11,7 +11,11 @@ import {
   Paper,
   IconButton,
   Typography,
+  MenuItem,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
+import { employeeService, LeaveType } from "../../services/employeeService";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import IconButtonPrimary from "../buttons/iconButtonPrimary";
@@ -37,11 +41,15 @@ interface LeaveItem {
 interface LeaveFormProps<T extends FieldValues> {
   control: Control<T>;
   disabled?: boolean;
+  staffCode?: string;
+  companyID?: string;
 }
 
 const LeaveForm = <T extends FieldValues>({
   control,
   disabled = false,
+  staffCode = "",
+  companyID = "",
 }: LeaveFormProps<T>) => {
   // Leave State
   const [leaveRows, setLeaveRows] = useState<LeaveItem[]>([]);
@@ -56,6 +64,63 @@ const LeaveForm = <T extends FieldValues>({
     page: 0,
     pageSize: 5,
   });
+
+  // API State
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Fetch Leave Types on mount
+  useEffect(() => {
+    const fetchLeaveTypes = async () => {
+      try {
+        const response = await employeeService.getLeaveTypes();
+        if (response.isSuccess && response.getSetupLeaveType) {
+          setLeaveTypes(response.getSetupLeaveType);
+        }
+      } catch (err: any) {
+        console.error("Error fetching leave types:", err);
+        setError("Failed to fetch leave types");
+      }
+    };
+
+    fetchLeaveTypes();
+  }, []);
+
+  // Fetch Leave Records on mount or when staffCode changes
+  useEffect(() => {
+    if (staffCode) {
+      fetchLeaveRecords(staffCode);
+    }
+  }, [staffCode]);
+
+  // Fetch Leave Records function
+  const fetchLeaveRecords = async (search: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await employeeService.getEmployeeLeave(search);
+      if (response.isSuccess && response.employeeLeave) {
+        const formattedRows = response.employeeLeave.map((leave, index) => ({
+          id: `${leave.staff_Code}_${index}`,
+          sNo: index + 1,
+          fromDate: leave.from_Date,
+          toDate: leave.to_Date,
+          leaveType: leave.leave_Type,
+          duration: leave.duration,
+          effDays: leave.effective_Days,
+          status: leave.status,
+        }));
+        setLeaveRows(formattedRows);
+      }
+    } catch (err: any) {
+      console.error("Error fetching leave records:", err);
+      setError("Failed to fetch leave records");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Leave Columns
   const leaveColumns: GridColDef[] = [
@@ -99,20 +164,54 @@ const LeaveForm = <T extends FieldValues>({
     setStatus("");
   };
 
-  const handleLeaveAdd = () => {
-    if (!fromDate || !toDate) return;
-    const newItem: LeaveItem = {
-      id: Date.now().toString(),
-      sNo: leaveRows.length + 1,
-      fromDate,
-      toDate,
-      leaveType,
-      duration,
-      effDays,
-      status,
-    };
-    setLeaveRows((prev) => [newItem, ...prev]);
-    handleLeaveClose();
+  const handleLeaveAdd = async () => {
+    if (!fromDate || !toDate) {
+      setError("From Date and To Date are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const leaveData = {
+        staff_Code: staffCode,
+        from_Date: fromDate,
+        to_Date: toDate,
+        leave_Type: leaveType,
+        duration: duration,
+        effective_Days: effDays,
+        status: status,
+        companyID: companyID,
+      };
+
+      await employeeService.postEmployeeLeave(leaveData);
+
+      // Add to local state
+      const newItem: LeaveItem = {
+        id: Date.now().toString(),
+        sNo: leaveRows.length + 1,
+        fromDate,
+        toDate,
+        leaveType,
+        duration,
+        effDays,
+        status,
+      };
+      setLeaveRows((prev) => [newItem, ...prev]);
+
+      // Optionally refresh the list from API
+      if (staffCode) {
+        await fetchLeaveRecords(staffCode);
+      }
+
+      handleLeaveClose();
+    } catch (err: any) {
+      console.error("Error adding leave:", err);
+      setError("Failed to add leave record");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLeaveDelete = (id: string) => {
@@ -147,11 +246,20 @@ const LeaveForm = <T extends FieldValues>({
         <Typography variant="h6" sx={{ mb: 2 }}>
           Leave Records
         </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
+            gap: 2,
             mb: 2,
+            flexWrap: "wrap",
           }}
         >
           <IconButtonPrimary
@@ -159,6 +267,28 @@ const LeaveForm = <T extends FieldValues>({
             label="Add Leave"
             onClick={handleLeaveOpen}
           />
+          <Box sx={{ display: "flex", gap: 1, flex: 1, maxWidth: 400 }}>
+            <TextField
+              size="small"
+              placeholder="Search by staff code..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              fullWidth
+            />
+            <Button
+              variant="contained"
+              onClick={() => fetchLeaveRecords(searchTerm)}
+              disabled={loading}
+              sx={{
+                backgroundColor: "#D9C48C",
+                color: "#011527",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#C5B17A" },
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : "Search"}
+            </Button>
+          </Box>
         </Box>
 
         <Paper sx={{ height: 400, width: "100%" }}>
@@ -225,11 +355,18 @@ const LeaveForm = <T extends FieldValues>({
             }}
           >
             <TextField
+              select
               label="Leave Type"
               value={leaveType}
               onChange={(e) => setLeaveType(e.target.value)}
               fullWidth
-            />
+            >
+              {leaveTypes.map((type) => (
+                <MenuItem key={type.id} value={type.name}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </TextField>
             <TextField
               label="Duration"
               value={duration}
@@ -260,17 +397,21 @@ const LeaveForm = <T extends FieldValues>({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleLeaveClose}>Cancel</Button>
+          <Button onClick={handleLeaveClose} disabled={loading}>
+            Cancel
+          </Button>
           <Button
             onClick={handleLeaveAdd}
             variant="contained"
+            disabled={loading}
             sx={{
               backgroundColor: "#D9C48C",
               color: "#011527",
               textTransform: "none",
+              "&:hover": { backgroundColor: "#C5B17A" },
             }}
           >
-            Add
+            {loading ? <CircularProgress size={24} /> : "Add"}
           </Button>
         </DialogActions>
       </Dialog>
