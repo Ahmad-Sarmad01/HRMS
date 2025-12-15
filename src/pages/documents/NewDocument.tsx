@@ -1,8 +1,6 @@
-import React, { FC, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { FC, useState, useRef, useEffect } from "react";
 import {
   Box,
-  Grid,
   Snackbar,
   Alert,
   Dialog,
@@ -11,351 +9,21 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  CircularProgress,
-  Typography,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  Checkbox,
-  FormControlLabel,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import AddIcon from "@mui/icons-material/Add";
-import SearchIcon from "@mui/icons-material/Search";
-import ListIcon from "@mui/icons-material/List";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DocumentActionBar from "../../component/document/DocumentActionBar";
+import DocumentForm, {
+  DocumentFormData,
+} from "../../component/document/DocumentForm";
+import DocumentGrid, {
+  DocumentData,
+} from "../../component/document/DocumentGrid";
 
-// Reusable PillButton Component
-interface PillButtonProps {
-  children: React.ReactNode;
-  index: number;
-  onClick: (index: number) => void;
-  isActive?: boolean;
-  type?: "button" | "submit" | "reset";
-}
-
-const PillButton: React.FC<PillButtonProps> = ({
-  children,
-  index,
-  onClick,
-  isActive = false,
-  type = "button",
-}) => {
-  return (
-    <Box
-      component="button"
-      type={type}
-      onClick={() => onClick(index)}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 0.5,
-        px: 2.2,
-        py: 0.7,
-        borderRadius: "12px",
-        border: "1px solid var(--primary)",
-        color: isActive ? "var(--text-light)" : "var(--primary)",
-        bgcolor: isActive ? "var(--primary)" : "transparent",
-        fontWeight: 600,
-        cursor: "pointer",
-        transition: "all 0.3s ease",
-        boxShadow: isActive
-          ? "0 4px 8px rgba(0,0,0,0.2)"
-          : "0 2px 4px rgba(0,0,0,0.1)",
-        "&:hover": isActive
-          ? { transform: "translateY(-2px)" }
-          : {
-              bgcolor: "var(--primary)",
-              color: "var(--text-light)",
-              boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-              transform: "translateY(-2px)",
-            },
-      }}
-    >
-      {children}
-    </Box>
-  );
-};
-
-// Form Field Component
-interface FormFieldProps {
-  label: string;
-  name: string;
-  type?: "text" | "date" | "select" | "number" | "checkbox" | "file";
-  required?: boolean;
-  control: any;
-  options?: string[];
-  error?: any;
-  disabled?: boolean;
-}
-
-const FormField: React.FC<FormFieldProps> = ({
-  label,
-  name,
-  type = "text",
-  required = false,
-  control,
-  options = [],
-  error,
-  disabled = false,
-}) => {
-  if (type === "checkbox") {
-    return (
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => (
-          <FormControlLabel
-            control={
-              <Checkbox
-                {...field}
-                checked={!!field.value}
-                disabled={disabled}
-                sx={{
-                  color: "#011527",
-                  "&.Mui-checked": { color: "#D9C48C" },
-                }}
-              />
-            }
-            label={
-              <Typography sx={{ fontWeight: 600, color: "#011527" }}>
-                {label}
-                {required && <span style={{ color: "#D32F2F" }}> *</span>}
-              </Typography>
-            }
-          />
-        )}
-      />
-    );
-  }
-
-  if (type === "file") {
-    return (
-      <Box display="flex" flexDirection="column">
-        <Typography
-          variant="body1"
-          sx={{
-            fontWeight: 600,
-            fontSize: "0.95rem",
-            color: "#011527",
-            mb: 0.5,
-          }}
-        >
-          {label}
-          {required && <span style={{ color: "#D32F2F" }}> *</span>}
-        </Typography>
-        <Controller
-          name={name}
-          control={control}
-          render={({ field: { onChange, value, ...field } }) => (
-            <Button
-              component="label"
-              variant="outlined"
-              startIcon={<CloudUploadIcon />}
-              disabled={disabled}
-              sx={{
-                borderColor: "#D9C48C",
-                color: "#011527",
-                textTransform: "none",
-                fontWeight: 600,
-                justifyContent: "flex-start",
-                "&:hover": {
-                  borderColor: "#B8A361",
-                  backgroundColor: "rgba(217, 196, 140, 0.08)",
-                },
-              }}
-            >
-              {value ? value.name || "File selected" : "Choose file"}
-              <input
-                {...field}
-                type="file"
-                hidden
-                disabled={disabled}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  onChange(file);
-                }}
-              />
-            </Button>
-          )}
-        />
-      </Box>
-    );
-  }
-
-  return (
-    <Box display="flex" flexDirection="column">
-      <Typography
-        variant="body1"
-        sx={{
-          fontWeight: 600,
-          fontSize: "0.95rem",
-          color: "#011527",
-          mb: 0.5,
-        }}
-      >
-        {label}
-        {required && <span style={{ color: "#D32F2F" }}> *</span>}
-      </Typography>
-
-      {type === "select" ? (
-        <Controller
-          name={name}
-          control={control}
-          rules={{ required }}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!error}>
-              <Select
-                {...field}
-                displayEmpty
-                disabled={disabled}
-                sx={{
-                  borderRadius: 2,
-                  backgroundColor: "#FFFFFF",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    border: "1px solid #E5E7EB",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#D9C48C",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#D9C48C",
-                    borderWidth: 2,
-                  },
-                  "& .MuiSelect-select": {
-                    fontSize: "0.95rem",
-                    color: "#011527",
-                    padding: "10px 12px",
-                    fontWeight: 500,
-                  },
-                }}
-              >
-                <MenuItem value="" disabled>
-                  <em>Select {label.toLowerCase()}</em>
-                </MenuItem>
-                {options.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        />
-      ) : (
-        <Controller
-          name={name}
-          control={control}
-          rules={{ required }}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              type={type}
-              fullWidth
-              disabled={disabled}
-              error={!!error}
-              placeholder={`Enter ${label.toLowerCase()}`}
-              InputLabelProps={type === "date" ? { shrink: true } : undefined}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  backgroundColor: "#FFFFFF",
-                  "& fieldset": {
-                    border: "1px solid #E5E7EB",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#D9C48C",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#D9C48C",
-                    borderWidth: 2,
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  fontSize: "0.95rem",
-                  color: "#011527",
-                  padding: "10px 12px",
-                  fontWeight: 500,
-                },
-                "& .MuiInputBase-input::placeholder": {
-                  color: "#A08B5F",
-                  opacity: 0.7,
-                },
-              }}
-            />
-          )}
-        />
-      )}
-    </Box>
-  );
-};
-
-// Form Section Component
-interface FormSectionProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-const FormSection: React.FC<FormSectionProps> = ({ title, children }) => {
-  return (
-    <Box
-      sx={{
-        p: 2,
-        border: "1px solid #E5E7EB",
-        borderRadius: 2,
-        backgroundColor: "#FAFAFA",
-        mb: 3,
-      }}
-    >
-      <Typography
-        variant="h6"
-        sx={{
-          fontWeight: 700,
-          color: "#011527",
-          mb: 2,
-          fontSize: "1.1rem",
-        }}
-      >
-        {title}
-      </Typography>
-      {children}
-    </Box>
-  );
-};
-
-// Form Data Interface based on client requirements
-interface DocumentFormData {
-  // Basic Information
-  staffCode: string;
-  staffName: string;
-  documentType: string;
-  documentNumber: string;
-  issueDate: string;
-  expiryDate: string;
-  issuePlace: string;
-  issueCountry: string;
-  
-  // Additional Details
-  status: string;
-  remarks: string;
-  isVerified: boolean;
-  verifiedBy: string;
-  verifiedDate: string;
-  
-  // File Upload
-  documentFile: any;
-  
-  // Notification Settings
-  enableExpiryAlert: boolean;
-  alertBeforeDays: string;
-}
-
-// Main Component
 const NewDocument: FC = () => {
-  const [activeBtn, setActiveBtn] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewConfirmDialog, setShowNewConfirmDialog] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
+  const [documents, setDocuments] = useState<DocumentData[]>([]);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -366,26 +34,79 @@ const NewDocument: FC = () => {
     severity: "success",
   });
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<DocumentFormData>({
-    defaultValues: {
-      staffCode: "",
-      staffName: "",
-      documentType: "",
-      documentNumber: "",
-      issueDate: "",
-      expiryDate: "",
-      issuePlace: "",
-      issueCountry: "",
-      status: "Active",
-      remarks: "",
-      isVerified: false,
-      verifiedBy: "",
-      verifiedDate: "",
-      documentFile: null,
-      enableExpiryAlert: true,
-      alertBeforeDays: "30",
-    },
-  });
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Fetch documents on component mount
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      setIsLoadingDocuments(true);
+
+      // TODO: Replace with actual API call
+      // const response = await apiClient.get("/GetEmployeeDocuments");
+      // setDocuments(response.data);
+
+      // Mock data for demonstration
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const mockDocuments: DocumentData[] = [
+        {
+          id: "1",
+          documentType: "Passport",
+          documentNumber: "P12345678",
+          issuePlace: "Dubai",
+          issueDate: "2020-01-15",
+          expiryDate: "2025-01-14",
+        },
+        {
+          id: "2",
+          documentType: "Emirates ID",
+          documentNumber: "784-1990-1234567-1",
+          issuePlace: "Abu Dhabi",
+          issueDate: "2021-03-20",
+          expiryDate: "2024-03-19",
+        },
+        {
+          id: "3",
+          documentType: "Visa",
+          documentNumber: "VIS987654",
+          issuePlace: "Sharjah",
+          issueDate: "2022-06-10",
+          expiryDate: "2026-01-10",
+        },
+        {
+          id: "4",
+          documentType: "Labour Card",
+          documentNumber: "LC456789",
+          issuePlace: "Ajman",
+          issueDate: "2021-09-05",
+          expiryDate: "2024-12-25",
+        },
+        {
+          id: "5",
+          documentType: "Driving License",
+          documentNumber: "DL123456",
+          issuePlace: "Dubai",
+          issueDate: "2019-11-12",
+          expiryDate: "2029-11-11",
+        },
+      ];
+
+      setDocuments(mockDocuments);
+    } catch (error: any) {
+      console.error("Error fetching documents:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to load documents.",
+        severity: "error",
+      });
+    } finally {
+      setIsLoadingDocuments(false);
+    }
+  };
 
   const onSubmit = async (data: DocumentFormData) => {
     try {
@@ -394,15 +115,12 @@ const NewDocument: FC = () => {
 
       // Create FormData for file upload
       const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value instanceof File) {
-          formData.append(key, value);
-        } else if (typeof value === "boolean") {
-          formData.append(key, value ? "Yes" : "No");
-        } else {
-          formData.append(key, value?.toString() || "");
-        }
-      });
+      formData.append("employeeId", data.employeeId);
+      formData.append("documentType", data.documentType);
+      formData.append("issueDate", data.issueDate);
+      if (data.documentFile) {
+        formData.append("documentFile", data.documentFile);
+      }
 
       // TODO: Replace with actual API call
       // const response = await apiClient.post("/PostEmployeeDocument", formData, {
@@ -418,8 +136,11 @@ const NewDocument: FC = () => {
         severity: "success",
       });
 
-      // Keep form data after successful submission
-      // reset();
+      // Refresh the document list
+      await fetchDocuments();
+
+      // Optionally clear the form after successful submission
+      // setResetTrigger((prev) => prev + 1);
     } catch (error: any) {
       console.error("Error submitting form:", error);
       setSnackbar({
@@ -432,20 +153,22 @@ const NewDocument: FC = () => {
     }
   };
 
-  const handlePillButtonClick = (index: number, title?: string) => {
-    setActiveBtn(index);
+  const handleNew = () => {
+    setShowNewConfirmDialog(true);
+  };
 
-    if (title === "New") {
-      setShowNewConfirmDialog(true);
-    } else if (title === "Save") {
-      // The button will trigger form submit through type="submit"
+  const handleSave = () => {
+    // Trigger form submission
+    if (formRef.current) {
+      formRef.current.dispatchEvent(
+        new Event("submit", { cancelable: true, bubbles: true })
+      );
     }
   };
 
   const handleConfirmNew = () => {
-    reset();
+    setResetTrigger((prev) => prev + 1);
     setShowNewConfirmDialog(false);
-    setActiveBtn(null);
   };
 
   const handleCloseSnackbar = () => {
@@ -453,288 +176,24 @@ const NewDocument: FC = () => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ px: { xs: 1, sm: 2 } }}>
+    <Box sx={{ px: { xs: 1, sm: 2 } }}>
       {/* Action Bar */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: { xs: "stretch", md: "center" },
-          justifyContent: "space-between",
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        <Box
-          component="h1"
-          sx={{
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-            fontWeight: 600,
-            color: "var(--primary)",
-            m: 0,
-          }}
-        >
-          New Document Registration
-        </Box>
+      <DocumentActionBar
+        onNew={handleNew}
+        onSave={handleSave}
+        isSaving={isSubmitting}
+      />
 
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-end" } }}>
-          <PillButton
-            index={0}
-            onClick={() => handlePillButtonClick(0, "New")}
-            isActive={activeBtn === 0}
-          >
-            <AddIcon fontSize="small" />
-            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-              New
-            </Box>
-          </PillButton>
+      {/* Document Form */}
+      <DocumentForm
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+        formRef={formRef}
+        resetTrigger={resetTrigger}
+      />
 
-          <PillButton
-            index={1}
-            type="submit"
-            onClick={() => handlePillButtonClick(1, "Save")}
-            isActive={activeBtn === 1}
-          >
-            {isSubmitting && activeBtn === 1 ? (
-              <CircularProgress size={16} sx={{ color: "inherit" }} />
-            ) : (
-              <SaveIcon fontSize="small" />
-            )}
-            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-              Save
-            </Box>
-          </PillButton>
-
-          <PillButton
-            index={2}
-            onClick={() => handlePillButtonClick(2, "Search")}
-            isActive={activeBtn === 2}
-          >
-            <SearchIcon fontSize="small" />
-            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-              Search
-            </Box>
-          </PillButton>
-
-          <PillButton
-            index={3}
-            onClick={() => handlePillButtonClick(3, "List")}
-            isActive={activeBtn === 3}
-          >
-            <ListIcon fontSize="small" />
-            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-              List
-            </Box>
-          </PillButton>
-        </Box>
-      </Box>
-
-      {/* Basic Information Section */}
-      <FormSection title="Basic Information">
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Staff Code"
-              name="staffCode"
-              required
-              control={control}
-              error={errors.staffCode}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Staff Name"
-              name="staffName"
-              required
-              control={control}
-              error={errors.staffName}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Document Type"
-              name="documentType"
-              type="select"
-              required
-              control={control}
-              options={[
-                "Passport",
-                "Visa",
-                "Emirates ID",
-                "Labour Card",
-                "Insurance Card",
-                "Driving License",
-                "Education Certificate",
-                "Experience Certificate",
-                "Medical Certificate",
-                "Police Clearance",
-                "Other",
-              ]}
-              error={errors.documentType}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Document Number"
-              name="documentNumber"
-              required
-              control={control}
-              error={errors.documentNumber}
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
-
-      {/* Document Details Section */}
-      <FormSection title="Document Details">
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Issue Date"
-              name="issueDate"
-              type="date"
-              required
-              control={control}
-              error={errors.issueDate}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Expiry Date"
-              name="expiryDate"
-              type="date"
-              required
-              control={control}
-              error={errors.expiryDate}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Issue Place"
-              name="issuePlace"
-              required
-              control={control}
-              error={errors.issuePlace}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Issue Country"
-              name="issueCountry"
-              type="select"
-              required
-              control={control}
-              options={[
-                "UAE",
-                "India",
-                "Pakistan",
-                "Bangladesh",
-                "Philippines",
-                "Egypt",
-                "Jordan",
-                "Sri Lanka",
-                "Nepal",
-                "Other",
-              ]}
-              error={errors.issueCountry}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Status"
-              name="status"
-              type="select"
-              required
-              control={control}
-              options={["Active", "Expired", "Pending", "Cancelled", "Renewed"]}
-              error={errors.status}
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
-
-      {/* Verification Details Section */}
-      <FormSection title="Verification Details">
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Is Verified"
-              name="isVerified"
-              type="checkbox"
-              control={control}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Verified By"
-              name="verifiedBy"
-              control={control}
-              error={errors.verifiedBy}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Verified Date"
-              name="verifiedDate"
-              type="date"
-              control={control}
-              error={errors.verifiedDate}
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
-
-      {/* Document Upload Section */}
-      <FormSection title="Document Upload">
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <FormField
-              label="Upload Document"
-              name="documentFile"
-              type="file"
-              control={control}
-              error={errors.documentFile}
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
-
-      {/* Expiry Alert Settings Section */}
-      <FormSection title="Expiry Alert Settings">
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Enable Expiry Alert"
-              name="enableExpiryAlert"
-              type="checkbox"
-              control={control}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <FormField
-              label="Alert Before Days"
-              name="alertBeforeDays"
-              type="number"
-              control={control}
-              error={errors.alertBeforeDays}
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
-
-      {/* Remarks Section */}
-      <FormSection title="Remarks">
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
-            <FormField
-              label="Remarks"
-              name="remarks"
-              control={control}
-              error={errors.remarks}
-            />
-          </Grid>
-        </Grid>
-      </FormSection>
+      {/* Document Grid */}
+      <DocumentGrid documents={documents} loading={isLoadingDocuments} />
 
       {/* Snackbar for notifications */}
       <Snackbar
