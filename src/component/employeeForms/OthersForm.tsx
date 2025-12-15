@@ -76,14 +76,14 @@ const OthersForm = <T extends FieldValues>({
       label: "Rate Increment By Percent",
       type: "text",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "periodsPerWeek",
       label: "Periods Per Week",
       type: "text",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "childTuition",
@@ -142,7 +142,7 @@ const OthersForm = <T extends FieldValues>({
       label: "Ticket Count",
       type: "text",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
     {
       name: "directReportingTo",
@@ -157,7 +157,7 @@ const OthersForm = <T extends FieldValues>({
       label: "No. of Children For Tuition",
       type: "text",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "replacement",
@@ -227,14 +227,14 @@ const OthersForm = <T extends FieldValues>({
       label: "Ticket Amount",
       type: "text",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
     {
       name: "insuranceAmount",
       label: "Insurance Amount",
       type: "text",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
     {
       name: "pensionAccount",
@@ -271,14 +271,14 @@ const OthersForm = <T extends FieldValues>({
       label: "Insurance No",
       type: "text",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
     {
       name: "insuranceExpDate",
       label: "Insurance Exp Date",
       type: "date",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
   ];
 
@@ -289,7 +289,7 @@ const OthersForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Yes", "No"],
-      required: true,
+      required: false,
     },
     {
       name: "labourCardCancelled",
@@ -297,21 +297,21 @@ const OthersForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["Yes", "No"],
-      required: true,
+      required: false,
     },
     {
       name: "visaCancelledDate",
       label: "Visa Cancelled Date",
       type: "date",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "labourCardCancelledDate",
       label: "Labour Card Cancelled Date",
       type: "date",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
   ];
 

@@ -53,7 +53,7 @@ const DateInput = <T extends FieldValues>({
             sx={{
               mt: 0.5,
               "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
+                borderRadius: 1,
                 backgroundColor: "#FFFFFF",
                 border: "1px solid #E5E7EB",
                 "&:hover fieldset": {

@@ -52,7 +52,7 @@ const SelectInput = <T extends FieldValues>({
               disabled={disabled}
               displayEmpty
               sx={{
-                borderRadius: 2,
+                borderRadius: 1,
                 backgroundColor: "#FFFFFF",
                 border: "1px solid #E5E7EB",
                 "& .MuiOutlinedInput-notchedOutline": {

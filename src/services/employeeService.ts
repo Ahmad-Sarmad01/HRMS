@@ -162,7 +162,7 @@ export const employeeService = {
       const response = await apiClient.get(
         `/GetEmployee_search?search=${encodeURIComponent(query)}`
       );
-      return response.data.getEmployee || [];
+      return response.data.employeeRegistration || [];
     } catch (error: any) {
       console.error("Error searching employees:", error);
       const errorMessage =

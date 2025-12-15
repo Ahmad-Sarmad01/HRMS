@@ -17,11 +17,11 @@ const PersonalForm = <T extends FieldValues>({
       name: "flatNoBuildingName",
       label: "Flat No/Building Name",
       type: "text",
-      required: true,
+      required: false,
     },
-    { name: "streetName", label: "Street Name", type: "text", required: true },
-    { name: "uaePhoneNo", label: "UAE Phone No", type: "text", required: true },
-    { name: "area", label: "Area", type: "text", required: true },
+    { name: "streetName", label: "Street Name", type: "text", required: false },
+    { name: "uaePhoneNo", label: "UAE Phone No", type: "text", required: false },
+    { name: "area", label: "Area", type: "text", required: false },
     {
       name: "emirates",
       label: "Emirates",
@@ -35,7 +35,7 @@ const PersonalForm = <T extends FieldValues>({
         "Fujairah",
         "UAQ",
       ],
-      required: true,
+      required: false,
     },
     { name: "poBox", label: "P.O Box", type: "text", fieldSize: "small" },
     {
@@ -43,13 +43,13 @@ const PersonalForm = <T extends FieldValues>({
       label: "Is Approver",
       type: "checkbox",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
   ];
 
   const homeCountryAddressFields = [
-    { name: "homeAddress1", label: "Address 1", type: "text", required: true },
-    { name: "homeAddress2", label: "Address 2", type: "text", required: true },
+    { name: "homeAddress1", label: "Address 1", type: "text", required: false },
+    { name: "homeAddress2", label: "Address 2", type: "text", required: false },
     {
       name: "homeCountry",
       label: "Country",
@@ -62,43 +62,43 @@ const PersonalForm = <T extends FieldValues>({
         "Philippines",
         "Other",
       ],
-      required: true,
+      required: false,
     },
     {
       name: "homeContactName",
       label: "Home Contact Name",
       type: "text",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
     {
       name: "homeCountryContact",
       label: "Home Country Contact",
       type: "text",
       fieldSize: "small",
-      required: true,
+      required: false,
     },
   ];
   const emergencyContactFields = [
-    { name: "emergencyName", label: "Name", type: "text", required: true },
+    { name: "emergencyName", label: "Name", type: "text", required: false },
     {
       name: "emergencyMobile",
       label: "Emergency Mobile",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       name: "emergencyAddress",
       label: "Address",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       name: "emergencyRelation",
       label: "Relation",
       type: "select",
       options: ["Father", "Mother", "Brother", "Sister", "Spouse", "Friend"],
-      required: true,
+      required: false,
     },
   ];
   const additionalInformationFields = [
@@ -107,20 +107,20 @@ const PersonalForm = <T extends FieldValues>({
       label: "Marital Status",
       type: "select",
       options: ["Single", "Married", "Widowed", "Divorced"],
-      required: true,
+      required: false,
     },
     {
       name: "bloodGroup",
       label: "Blood Group",
       type: "select",
       options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-      required: true,
+      required: false,
     },
     {
       name: "placeOfBirth",
       label: "Place Of Birth",
       type: "text",
-      required: true,
+      required: false,
     },
     {
       name: "countryOfBirth",
@@ -134,7 +134,7 @@ const PersonalForm = <T extends FieldValues>({
         "Philippines",
         "Other",
       ],
-      required: true,
+      required: false,
     },
   ];
   const provisioningFields = [
@@ -143,40 +143,40 @@ const PersonalForm = <T extends FieldValues>({
       label: "Gratuity As",
       type: "select",
       options: ["Basic Salary", "Gross Salary"],
-      required: true,
+      required: false,
     },
     {
       name: "gratuityStartDate",
       label: "Gratuity Start Date",
       type: "date",
-      required: true,
+      required: false,
     },
     {
       name: "gratuityEndDate",
       label: "Gratuity End Date",
       type: "date",
-      required: true,
+      required: false,
     },
     {
       name: "leaveSalaryAs",
       label: "Leave Salary As",
       type: "select",
       options: ["Basic Salary", "Gross Salary"],
-      required: true,
+      required: false,
     },
     {
       name: "insuranceAs",
       label: "Insurance As",
       type: "select",
       options: ["Company", "Self"],
-      required: true,
+      required: false,
     },
     {
       name: "ticketAs",
       label: "Ticket As",
       type: "select",
       options: ["Yearly", "Every 2 Years", "None"],
-      required: true,
+      required: false,
     },
   ];
 

@@ -53,7 +53,7 @@ const FileInput = <T extends FieldValues>({
               startIcon={<UploadFileIcon />}
               sx={{
                 mt: 0.5,
-                borderRadius: 2,
+                borderRadius: 1,
                 backgroundColor: "#FFFFFF",
                 border: `1px solid ${error ? "#D32F2F" : "#E5E7EB"}`,
                 color: "#011527",

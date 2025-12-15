@@ -39,14 +39,14 @@ const PrimaryForm = <T extends FieldValues>({
       label: "Staff Code",
       type: "text",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "staffName",
       label: "Staff Name",
       type: "text",
       fieldSize: "large",
-      required: true,
+      required: false,
     },
     {
       name: "status",
@@ -54,7 +54,7 @@ const PrimaryForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: formatOptions(statusOptions),
-      required: true,
+      required: false,
     },
     {
       name: "branch",
@@ -62,14 +62,14 @@ const PrimaryForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: formatOptions(branchOptions),
-      required: true,
+      required: false,
     },
     {
       name: "joiningDate",
       label: "Joining Date",
       type: "date",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "designation",
@@ -77,7 +77,7 @@ const PrimaryForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: formatOptions(designationOptions),
-      required: true,
+      required: false,
     },
     {
       name: "subStatus",
@@ -93,7 +93,7 @@ const PrimaryForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: ["IT", "HR", "Finance", "Operations"],
-      required: true,
+      required: false,
     },
     {
       name: "employeeCategory",
@@ -109,7 +109,7 @@ const PrimaryForm = <T extends FieldValues>({
       type: "select",
       fieldSize: "normal",
       options: formatOptions(nationalityOptions),
-      required: true,
+      required: false,
     },
     {
       name: "uaeMobileNo",
@@ -118,14 +118,14 @@ const PrimaryForm = <T extends FieldValues>({
       fieldSize: "normal",
       inputMode: "numeric" as const,
       maxLength: 10,
-      required: true,
+      required: false,
     },
     {
       name: "personalEmail",
       label: "Personal Email",
       type: "email",
       fieldSize: "normal",
-      required: true,
+      required: false,
     },
     {
       name: "officialEmail",

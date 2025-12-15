@@ -167,6 +167,18 @@ export const fieldNameMapping: Record<string, keyof EmployeeFormData> = {
   // Remaining fields
   idCard: "iD_Card",
   companyID: "companyID",
+
+  // ======== Additional Contract & Finance Fields ========
+  accommodationAmount: "accomodation_Amount",
+  contractStartDate: "contract_Start_Date",
+  contractEndDate: "contract_End_Date",
+  educationalReimbursement: "educational_Reimbursment",
+  erStartDate: "eR_Start_Date",
+  erEndDate: "eR_End_Date",
+  contractRemarks: "contract_Remarks",
+  creditAccount: "credit_Account",
+  iban: "iban",
+  employeeBank: "employee_Bank",
 };
 
 // Converts frontend form data to backend API format
@@ -256,6 +268,8 @@ const numericFields = [
   "pension",
   "noticePeriod",
   "seniorityNo",
+  "accommodationAmount",
+  "educationalReimbursement",
 
   // ID and code fields
   "staffCode",

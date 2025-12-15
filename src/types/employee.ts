@@ -137,15 +137,16 @@ export interface EmployeeFormData {
   visa_Cancellation_Date: string;
   labour_Card_Cancellation_Date: string;
   companyID: string;
-  // accommodationAmount: string;
-  // startDate1: string;
-  // endDate1: string;
-  // educationalReimbursement: string;
-  // startDate2: string;
-  // endDate2: string;
-  // creditAccount: string;
-  // ibanNo: string;
-  // employeeBank: string;
+  accomodation_Amount: string;
+  contract_Start_Date: string;
+  contract_End_Date: string;
+  educational_Reimbursment: string;
+  eR_Start_Date: string;
+  eR_End_Date: string;
+  contract_Remarks: string;
+  credit_Account: string;
+  iban: string;
+  employee_Bank: string;
 }
 
 // Employee interface to match the structure of the data returned from the GetEmployee API endpoint
@@ -204,7 +205,7 @@ export interface Employee {
   tlS_Expiry_Date: string;
   remarks: string;
   companyID: string;
-    flat_No_Building_Name: string;
+  flat_No_Building_Name: string;
   street_Name: string;
   uaE_Phone_No: string;
   area: string;
@@ -287,4 +288,14 @@ export interface Employee {
   labour_Card_Cancelled: string;
   visa_Cancellation_Date: string;
   labour_Card_Cancellation_Date: string;
+  accomodation_Amount: string;
+  contract_Start_Date: string;
+  contract_End_Date: string;
+  educational_Reimbursment: string;
+  eR_Start_Date: string;
+  eR_End_Date: string;
+  contract_Remarks: string;
+  credit_Account: string;
+  iban: string;
+  employee_Bank: string;
 }
